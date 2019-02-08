@@ -1,0 +1,21 @@
+{{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
+resources:
+{{- end }}
+    {{- if or (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
+    requests:
+    {{- end }}
+    {{- if .Values.mariadb.server.resources.requests.cpu }}
+    cpu: {{ .Values.mariadb.server.resources.requests.cpu }}
+    {{- end }}
+    {{- if .Values.mariadb.server.resources.requests.memory }}
+    memory: {{ .Values.mariadb.server.resources.requests.memory }}
+    {{- end }}
+    {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) }}
+    limits:
+    {{- end }}
+    {{- if .Values.mariadb.server.resources.limits.cpu }}
+    cpu: {{ .Values.mariadb.server.resources.limits.cpu }}
+    {{- end }}
+    {{- if .Values.mariadb.server.resources.limits.memory }}
+    memory: {{ .Values.mariadb.server.resources.limits.memory }}
+    {{- end }}

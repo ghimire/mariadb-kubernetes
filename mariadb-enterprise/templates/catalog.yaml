@@ -1,8 +1,8 @@
-{{ if eq .Values.mariadb.cluster.topology "standalone" }}
 {{ tpl (.Files.Get "catalog/mariadb-config.yaml") . }}
 ---
 {{ tpl (.Files.Get "catalog/mariadb-secret.yaml") . }}
 ---
+{{ if eq .Values.mariadb.cluster.topology "standalone" }}
 {{ tpl (.Files.Get "catalog/standalone.yaml") . }}
 {{ else if eq .Values.mariadb.cluster.topology "columnstore" }}
 {{ tpl (.Files.Get "catalog/mariadb-config.yaml") . }}
@@ -23,23 +23,19 @@
 ---
 {{ tpl (.Files.Get "catalog/columnstore-standalone.yaml") . }}
 {{ else if eq .Values.mariadb.cluster.topology "masterslave" }}
-{{ tpl (.Files.Get "catalog/mariadb-config.yaml") . }}
----
-{{ tpl (.Files.Get "catalog/mariadb-secret.yaml") . }}
----
 {{ tpl (.Files.Get "catalog/masterslave.yaml") . }}
 ---
 {{ tpl (.Files.Get "catalog/maxscale.yaml") . }}
 ---
 {{ tpl (.Files.Get "catalog/state-store.yaml") . }}
 {{ else if eq .Values.mariadb.cluster.topology "galera" }}
-{{ tpl (.Files.Get "catalog/mariadb-config.yaml") . }}
----
-{{ tpl (.Files.Get "catalog/mariadb-secret.yaml") . }}
----
 {{ tpl (.Files.Get "catalog/galera.yaml") . }}
 ---
 {{ tpl (.Files.Get "catalog/maxscale.yaml") . }}
 ---
 {{ tpl (.Files.Get "catalog/state-store.yaml") . }}
+{{ end }}
+{{ if .Values.mariadb.backup.schedule }}
+---
+{{ tpl (.Files.Get "catalog/backup-job.yaml") . }}
 {{ end }}

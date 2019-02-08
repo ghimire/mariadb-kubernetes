@@ -227,9 +227,7 @@ The following list of parameters can be used with the helm chart by either modif
 | mariadb.server.resources.requests.memory   | null                     | The requested memory for each Server pod                                                                            |
 | mariadb.server.resources.limits.cpu        | null                     | The maximum share of CPU for each Server pod                                                                        |
 | mariadb.server.resources.limits.memory     | null                     | The maximum share of memory for each Server pod                                                                     |
-| mariadb.server.backup.nfs.server           | null                     | Backup NFS server host                                                                                              |
-| mariadb.server.backup.nfs.path             | /                        | Backup NFS server path to mount                                                                                     |
-| mariadb.server.backup.nfs.restoreFrom      | null                     | Subdirectory to use to restore the database on initial startup                                                      |
+| mariadb.server.restore.restoreFrom         | null                     | Subdirectory to use to restore the database on initial startup                                                      |
 | _MaxScale instances_                       |                          |                                                                                                                     |
 | mariadb.maxscale.image                     | mariadb/maxscale:2.2     | Name of Docker image for MaxScale                                                                                   |
 | mariadb.maxscale.ports.readonly            | 4008                     | TCP/IP port on which the cluster instance exposes a read-only SQL interface through a service endpoint.             |
@@ -249,6 +247,11 @@ The following list of parameters can be used with the helm chart by either modif
 | mariadb.columnstore.totalUmMemory          | 1G                       | Amount of physical memory to utilize for joins, intermediate results and set operations on the UM         |
 | mariadb.columnstore.um.replicas            | 1                        | Number of Columnstore UM instances in columnstore topology                                                  |
 | mariadb.columnstore.pm.replicas            | 3                        | Number of Columnstore PM instances in columnstore topology                                                  |
+| mariadb.backup.target.type           | auto                     | Backup type (`auto` or `nfs`)                                                                                              |
+| mariadb.backup.target.server           | null                     | Backup NFS server host (only if type is `nfs`)                                                                                              |
+| mariadb.backup.target.path             | /                        | Backup NFS server path to mount (only if type is `nfs`)                                                                                     |
+| mariadb.backup.schedule             | null                        | Backup schedule in crontab format                                                                                     |
+| mariadb.backup.image             | gcr.io/dbaas-development/mariadb-operator-python:0.0.1                        | The backup container image                                                                                     |
 
 Refer to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container for the definition of resource requests and limits.
 
@@ -333,7 +336,7 @@ You can use an existing backup and load it when starting a new cluster. Restorin
 #### Restore procedure
 
 1. Change these values in the values.yaml file:
-    - `mariadb.server.backup.restoreFrom` should point to the exact directory containing the backup.
+    - `mariadb.server.restore.restoreFrom` should point to the exact directory containing the backup.
     - `mariadb.server.backup.nfs.server` should be the IP of hostname of the NFS server
     - `mariadb.server.backup.nfs.path` should be the NFS mount point (optional, default is `"/"`)
 2. Start the cluster as you would normally using

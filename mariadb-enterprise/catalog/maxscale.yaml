@@ -40,8 +40,8 @@ metadata:
     {{- if .Values.mariadb.cluster.labels }}
 {{ toYaml .Values.mariadb.cluster.labels | indent 4 }}
     {{- end }}
-    {{- if .Values.mariadb.server.labels }}
-{{ toYaml .Values.mariadb.server.labels | indent 4 }}
+    {{- if .Values.mariadb.maxscale.labels }}
+{{ toYaml .Values.mariadb.maxscale.labels | indent 4 }}
     {{- end }}
 spec:
   selector:
