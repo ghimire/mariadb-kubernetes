@@ -1,0 +1,7 @@
+mariadb: {{ .Release.Name }}
+{{- if .Values.mariadb.cluster.id }}
+id.mariadb: "{{ .Values.mariadb.cluster.id }}"
+{{- end }}
+{{- if .Values.mariadb.cluster.labels }}
+{{ toYaml .Values.mariadb.cluster.labels}}
+{{- end }}

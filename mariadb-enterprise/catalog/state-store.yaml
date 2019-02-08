@@ -14,11 +14,8 @@ apiVersion: v1
 metadata:
   name: {{ .Release.Name }}-mdb-state
   labels:
-    mariadb: {{ .Release.Name }}
     state-store.mariadb: {{ .Release.Name }}
-    {{ if .Values.mariadb.cluster.id }}
-    id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-    {{ end }}
+{{ tpl (.Files.Get "snippets/labels") . | indent 4 }}
 spec:
   selector:
     state-store.mariadb: {{ .Release.Name }}
@@ -31,11 +28,8 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-mdb-state
   labels:
-    mariadb: {{ .Release.Name }}
     state-store.mariadb: {{ .Release.Name }}
-    {{ if .Values.mariadb.cluster.id }}
-    id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-    {{ end }}
+{{ tpl (.Files.Get "snippets/labels") . | indent 4 }}
 spec:
   replicas: 1
   selector:

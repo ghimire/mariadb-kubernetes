@@ -32,14 +32,11 @@ mariadb:
       limits:
         cpu: null                                # e.g. "3000m"
         memory: null                             # e.g. "9G"
-    backup:
-      nfs:
-        server: null                             # NFS server hostname or ip
-        path: /                                  # NFS path to mount
+    restore:
       restoreFrom: null                          # name of restore subdirectory
       claimName: null
 
-# maxscale parameters
+  # maxscale parameters
   maxscale:
     image: mariadb/maxscale:2.2
     labels: null                                 # custom labels applied to maxscale pods only
@@ -56,7 +53,7 @@ mariadb:
         cpu: null     # e.g. "3000m"
         memory: null  # e.g. "9G"
 
-# statestore parameters
+  # statestore parameters
   statestore:
     image: mariadb/statestore:0.0.3
 
@@ -91,4 +88,13 @@ mariadb:
     #The following parameters will be removed from the final setup
     test: false
     sandbox: false
-    retries: 60 # 60x5=300sec - up to 5min 
+    retries: 60 # 60x5=300sec - up to 5min
+
+  # backup parameters
+  backup:
+    image: gcr.io/dbaas-development/mariadb-operator-python:0.0.2
+    schedule: "* * * * *"
+    target:
+      type: nfs
+      server: null
+      path: /
