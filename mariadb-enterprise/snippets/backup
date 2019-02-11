@@ -22,3 +22,6 @@
     subPath: mysql
   - name: mariadb-socket-vol
     mountPath: /var/run/mysqld
+  - name: mariadb-secrets-vol
+    mountPath: "/etc/hmac_secret"
+    readOnly: true
