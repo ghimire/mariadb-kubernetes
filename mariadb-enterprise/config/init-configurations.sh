@@ -33,7 +33,6 @@ if [ "$1" == "maxscale" ]; then
 else
     cp /mnt/config-template/start-mariadb-instance.sh /mnt/config-map
     cp /mnt/config-template/backup-save.sh /mnt/config-map
-    cp /mnt/config-template/backup-job.sh /mnt/config-map
     # if this is not a maxscale instance, make sure to ask maxscale who is the master
     MASTER_HOST=$(cat /mnt/config-map/master)
     if [[ ! -d /var/lib/mysql/mysql ]]; then

@@ -28,8 +28,6 @@ spec:
             - name: CLUSTER_TOPOLOGY
               value: {{ .Values.mariadb.cluster.topology }}
             volumeMounts:
-            - name: mariadb-configtemplate-vol
-              mountPath: /mnt/config-template
             - name: mariadb-secrets-vol
               mountPath: "/etc/hmac_secret"
               readOnly: true
@@ -37,9 +35,6 @@ spec:
           restartPolicy: Never
 
           volumes:
-          - name: mariadb-configtemplate-vol
-            configMap:
-              name: {{ .Release.Name }}-mariadb-config
           - name: mariadb-secrets-vol
             secret:
               secretName: {{ .Release.Name }}-mariadb-secret
