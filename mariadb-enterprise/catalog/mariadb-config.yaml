@@ -65,9 +65,6 @@ data:
   backup-save.sh: |
 {{ tpl (.Files.Get "config/backup-save.sh") . | indent 4 }}
 
-  backup-job.sh: |
-{{ tpl (.Files.Get "config/backup-job.sh") . | indent 4 }}
-
 {{- if or (eq .Values.mariadb.cluster.topology "standalone") (eq .Values.mariadb.cluster.topology "masterslave") }}
   replication.sql: |
 {{ tpl (.Files.Get "config/replication.sql") . | indent 4 }}
