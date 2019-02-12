@@ -3,9 +3,9 @@ kind: CronJob
 metadata:
   name: {{ .Release.Name }}-mdb-backup-job
   labels:
-{{ tpl (.Files.Get "snippets/labels") . | indent 4 }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
     backup-job.mariadb: {{ .Release.Name }}
-{{ tpl (.Files.Get "snippets/annotations") . | indent 2}}
+{{ tpl (.Files.Get "snippets/annotations.yaml") . | indent 2}}
 spec:
   schedule: "{{ .Values.mariadb.backup.schedule }}"
   jobTemplate:
@@ -21,7 +21,7 @@ spec:
             command:
               - python3
               - /python/backup/call.py
-            imagePullPolicy: Always
+            imagePullPolicy: IfNotPresent
             env:
             - name: RELEASE_NAME
               value: {{ .Release.Name }}

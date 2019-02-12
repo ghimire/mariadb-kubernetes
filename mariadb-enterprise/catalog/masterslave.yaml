@@ -6,7 +6,7 @@
 # kubectl scale sts <label>-mdb-ms --replicas=<number of server instances>
 
 # Headless service for stable DNS entries for StatefulSet members
-{{ tpl (.Files.Get "snippets/external-service") . }}
+{{ tpl (.Files.Get "snippets/external-service.yaml") . }}
 ---
 # a StatefulSet for the master/slave cluster
 apiVersion: apps/v1
@@ -14,7 +14,7 @@ kind: StatefulSet
 metadata:
   name: {{ .Release.Name }}-mdb-ms
   labels:
-{{ tpl (.Files.Get "snippets/labels") . | indent 4 }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
     server.mariadb: {{ .Release.Name }}
 spec:
   selector:
@@ -25,11 +25,13 @@ spec:
   template:
     metadata:
       labels:
-{{ tpl (.Files.Get "snippets/labels") . | indent 8 }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 8 }}
         server.mariadb: {{ .Release.Name }}
-{{ tpl (.Files.Get "snippets/annotations") . | indent 6 }}
+{{ tpl (.Files.Get "snippets/annotations.yaml") . | indent 6 }}
     spec:
       initContainers:
+{{ tpl (.Files.Get "snippets/nfs-delay.yaml") . | indent 6 }}
+
       # runs a state store client to determine the IP of the active master
       - name: init-get-master
         image: {{ .Values.mariadb.statestore.image }}
@@ -83,10 +85,8 @@ spec:
         - containerPort: 3306
 {{ tpl (.Files.Get "snippets/resources") . | indent 8 }}
         volumeMounts:
-        {{- if .Values.mariadb.backup.target.server }}
         - name: backup-data-storage
           mountPath: /backup-storage
-        {{- end }}
         - name: mariadb-entrypoint-vol
           mountPath: /docker-entrypoint-initdb.d
         - name: mariadb-config-vol
@@ -121,49 +121,10 @@ spec:
           - name: mariadb-configtemplate-vol
             mountPath: /mnt/config-template
 
-{{ tpl (.Files.Get "snippets/backup") . | indent 6 }}
+{{ tpl (.Files.Get "snippets/backup.yaml") . | indent 6 }}
 
       restartPolicy: Always
 
-      volumes:
-      {{- if .Values.mariadb.backup.target.server }}
-      - name: backup-data-storage
-        nfs:
-          server: {{ .Values.mariadb.backup.target.server }}
-          path: {{ .Values.mariadb.backup.target.path }}
-        capacity:
-          storage: 1Mi
-        accessModes:
-          - ReadWriteMany
-      {{- end }}
-      - name: mariadb-entrypoint-vol
-        emptyDir: {}
-      - name: mariadb-config-vol
-        emptyDir: {}
-      - name: mariadb-configtemplate-vol
-        configMap:
-          name: {{ .Release.Name }}-mariadb-config
-      - name: mariadb-secrets-vol
-        secret:
-          secretName: {{ .Release.Name }}-mariadb-secret
-      - name: mariadb-socket-vol
-        emptyDir: {}
-        
-  # ensures persistent volumes end up on the same pod
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-      labels:
-        mariadb: {{ .Release.Name }}
-        storage.mariadb: {{ .Release.Name }}
-        {{- if .Values.mariadb.cluster.id }}
-        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-        {{- end }}
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: {{ .Values.mariadb.server.storage.size }}
-      {{- if .Values.mariadb.server.storage.class }}
-      storageClassName: {{ .Values.mariadb.server.storage.class }}
-      {{- end }}
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
+
+{{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}

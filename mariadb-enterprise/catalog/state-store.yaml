@@ -15,7 +15,7 @@ metadata:
   name: {{ .Release.Name }}-mdb-state
   labels:
     state-store.mariadb: {{ .Release.Name }}
-{{ tpl (.Files.Get "snippets/labels") . | indent 4 }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
 spec:
   selector:
     state-store.mariadb: {{ .Release.Name }}
@@ -29,7 +29,7 @@ metadata:
   name: {{ .Release.Name }}-mdb-state
   labels:
     state-store.mariadb: {{ .Release.Name }}
-{{ tpl (.Files.Get "snippets/labels") . | indent 4 }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
 spec:
   replicas: 1
   selector:

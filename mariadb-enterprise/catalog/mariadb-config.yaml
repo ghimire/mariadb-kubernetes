@@ -7,7 +7,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-mariadb-config
   labels:
-{{ tpl (.Files.Get "snippets/labels") . | indent 4 }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
 data:
   init-configurations.sh: |
 {{- if (eq .Values.mariadb.cluster.topology "columnstore") }}
