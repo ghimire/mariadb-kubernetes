@@ -29,7 +29,7 @@ spec:
               value: {{ .Values.mariadb.cluster.topology }}
             volumeMounts:
             - name: mariadb-secrets-vol
-              mountPath: "/etc/hmac_secret"
+              mountPath: "/etc/hmac-secret"
               readOnly: true
 
           restartPolicy: Never
