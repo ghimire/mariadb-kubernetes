@@ -39,3 +39,7 @@
 ---
 {{ tpl (.Files.Get "catalog/backup-job.yaml") . }}
 {{ end }}
+{{- if eq .Values.mariadb.backup.target.type "auto" }}
+---
+{{ tpl (.Files.Get "catalog/nfs.yaml") . }}
+{{ end }}
