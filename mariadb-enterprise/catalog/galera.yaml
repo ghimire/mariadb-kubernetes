@@ -87,7 +87,7 @@ spec:
           value: {{ .Values.mariadb.cluster.topology }}
         ports:
         - containerPort: 3306
-{{ tpl (.Files.Get "snippets/resources") . | indent 8 }}
+{{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
         - name: backup-data-storage
           mountPath: /backup-storage
