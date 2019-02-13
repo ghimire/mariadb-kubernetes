@@ -96,6 +96,6 @@ mariadb:
     schedule: "* * * * *"
     secret: "random_string"
     target:
-      type: nfs
+      type: auto
       server: null
       path: /
