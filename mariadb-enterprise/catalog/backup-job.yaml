@@ -17,17 +17,19 @@ spec:
         spec:
           containers:
           - name: backup-job
-            image: {{ .Values.mariadb.backup.image }}
+            image: ellerbrock/alpine-curl-ssl
             command:
-              - python3
-              - /python/backup/call.py
-            imagePullPolicy: IfNotPresent
+            - sh
+            - /mnt/config-template/backup-job.sh
+            imagePullPolicy: Always
             env:
             - name: RELEASE_NAME
               value: {{ .Release.Name }}
             - name: CLUSTER_TOPOLOGY
               value: {{ .Values.mariadb.cluster.topology }}
             volumeMounts:
+            - name: mariadb-configtemplate-vol
+              mountPath: /mnt/config-template
             - name: mariadb-secrets-vol
               mountPath: "/etc/hmac-secret"
               readOnly: true
@@ -35,6 +37,9 @@ spec:
           restartPolicy: Never
 
           volumes:
+          - name: mariadb-configtemplate-vol
+            configMap:
+              name: {{ .Release.Name }}-mariadb-config
           - name: mariadb-secrets-vol
             secret:
               secretName: {{ .Release.Name }}-mariadb-secret
