@@ -2,7 +2,7 @@ volumes:
 - name: backup-data-storage
   nfs:
   {{- if eq .Values.mariadb.backup.target.type "auto" }}
-    server: {{ .Release.Name }}-mdb-nfs-0.{{ .Release.Name }}-mdb-nfs.{{ .Release.Namespace }}.svc.cluster.local
+    server: {{ .Release.Name }}-mdb-1-nfs-0.{{ .Release.Name }}-mdb-nfs.{{ .Release.Namespace }}.svc.cluster.local
   {{- else }}
     server: {{ .Values.mariadb.backup.target.server }}
   {{- end }}
