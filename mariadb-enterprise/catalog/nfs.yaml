@@ -14,7 +14,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-mdb-nfs
+  name: {{ .Release.Name }}-mdb-1-nfs
   labels:
 {{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
     nfs.mariadb: {{ .Release.Name }}

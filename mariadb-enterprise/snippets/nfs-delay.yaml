@@ -2,6 +2,6 @@
 - name: nfs-delay
   image: alpine:latest
   command: ["/bin/sh"]
-  args: ["-c", "until ping -c1 {{ .Release.Name }}-mdb-nfs-0.{{ .Release.Name }}-mdb-nfs &>/dev/null; do :; done"]
+  args: ["-c", "until ping -c1 {{ .Release.Name }}-mdb-1-nfs-0.{{ .Release.Name }}-mdb-nfs &>/dev/null; do :; done"]
   imagePullPolicy: IfNotPresent
 {{- end }}
