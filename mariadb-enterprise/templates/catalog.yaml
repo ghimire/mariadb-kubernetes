@@ -31,7 +31,7 @@
 ---
 {{ tpl (.Files.Get "catalog/backup-job.yaml") . }}
 {{ end }}
-{{- if eq .Values.mariadb.backup.target.type "auto" }}
+{{- if and (eq .Values.mariadb.backup.target.type "auto") (or (eq .Values.mariadb.cluster.topology "masterslave") (eq .Values.mariadb.cluster.topology "standalone") (eq .Values.mariadb.cluster.topology "galera")) }}
 ---
 {{ tpl (.Files.Get "catalog/nfs.yaml") . }}
 {{ end }}
