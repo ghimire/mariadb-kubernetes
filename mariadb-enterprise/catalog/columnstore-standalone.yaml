@@ -81,7 +81,7 @@ spec:
           - columnstore
         env:
           - name: BACKUP_CLAIM_NAME
-            value: {{ .Values.mariadb.server.backup.claimName }}
+            value: {{ .Values.mariadb.server.restore.claimName }}
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
         volumeMounts:
@@ -111,7 +111,7 @@ spec:
         - containerPort: 3306
 {{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
-        {{- if .Values.mariadb.server.backup.claimName }}
+        {{- if .Values.mariadb.server.restore.claimName }}
         - name: backup-data-storage
           mountPath: /backup
         {{- end }}
@@ -124,10 +124,10 @@ spec:
           mountPath: /usr/local/mariadb/columnstore/mysql/db
           subPath: db
       volumes:
-      {{- if .Values.mariadb.server.backup.claimName }}
+      {{- if .Values.mariadb.server.restore.claimName }}
       - name: backup-data-storage
         persistentVolumeClaim:
-          claimName: {{ .Values.mariadb.server.backup.claimName }}
+          claimName: {{ .Values.mariadb.server.restore.claimName }}
       {{- end }}
       - name: mariadb-entrypoint-vol
         emptyDir: {}
