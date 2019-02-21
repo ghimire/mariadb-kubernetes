@@ -56,7 +56,7 @@ mariadb:
   statestore:
     image: mariadb/statestore:0.0.3
 
-# columnstore cluster parameters
+  # columnstore cluster parameters
   columnstore:
     singlenodeCombined: false
     stableIpServices: false

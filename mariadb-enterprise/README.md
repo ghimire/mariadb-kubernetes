@@ -345,7 +345,7 @@ You can use an existing backup and load it when starting a new cluster. Restorin
     ```
 3. The above as a single command:
     ```sh
-    helm install . --name <release-name> --set mariadb.server.backup.restoreFrom=<backup_path> --set mariadb.server.backup.nfs.server=<nfs_server_ip> --set mariadb.server.backup.nfs.path=<nfs_mount_point>
+    helm install . --name <release-name> --set mariadb.server.restore.restoreFrom=<backup_path> --set mariadb.backup.target.server=<nfs_server_ip> --set mariadb.backup.target.path=<nfs_mount_point> --set mariadb.backup.target.type=nfs
     ```
 
 ## Running Sanity Test and Benchmark tests
