@@ -188,7 +188,7 @@ The cluster topology can be specified by changing the `mariadb.cluster.topology`
 - with NFS connection (allows to perform backup in the future)
 
   ```sh
-  helm install . --name <release-name> --set mariadb.cluster.topology=masterslave --set mariadb.server.backup.nfs.server=<NFS_SERVER_IP>
+  helm install . --name <release-name> --set mariadb.cluster.topology=masterslave --set mariadb.backup.target.server=<NFS_SERVER_IP> --set mariadb.backup.target.type=nfs
   ```
 
 - without NFS connection (the build in backup functionality can't be used)
@@ -337,8 +337,8 @@ You can use an existing backup and load it when starting a new cluster. Restorin
 
 1. Change these values in the values.yaml file:
     - `mariadb.server.restore.restoreFrom` should point to the exact directory containing the backup.
-    - `mariadb.server.backup.nfs.server` should be the IP of hostname of the NFS server
-    - `mariadb.server.backup.nfs.path` should be the NFS mount point (optional, default is `"/"`)
+    - `mariadb.backup.target.server` should be the IP of hostname of the NFS server
+    - `mariadb.backup.target.path` should be the NFS mount point (optional, default is `"/"`)
 2. Start the cluster as you would normally using
     ```sh
     helm install .
