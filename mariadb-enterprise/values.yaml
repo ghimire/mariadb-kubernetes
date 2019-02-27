@@ -99,3 +99,8 @@ mariadb:
       type: auto
       server: null
       path: /
+
+  azure:
+    accountName: null
+    storageKey: null
+    shareName: null

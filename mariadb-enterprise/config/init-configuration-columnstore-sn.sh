@@ -70,6 +70,7 @@ fi
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 expand_templates /mnt/config-template/start-mariadb-instance.sh >> /mnt/config-map/start-mariadb-instance.sh
+expand_templates /mnt/config-template/preload-azure.sh >> /mnt/config-map/preload-azure.sh
 
 if [[ ! -z $MARIADB_CS_DEBUG ]]; then
     echo "Init Columnstore"

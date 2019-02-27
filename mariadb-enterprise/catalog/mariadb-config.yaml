@@ -80,3 +80,8 @@ data:
   backup-restore.sh: |
 {{ tpl (.Files.Get "config/backup-restore.sh") . | indent 4 }}
 {{- end }}
+
+{{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
+  preload-azure.sh: |
+{{ tpl (.Files.Get "config/columnstore/preload-azure.sh") . | indent 4 }}
+{{- end }}

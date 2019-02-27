@@ -81,6 +81,7 @@ if [[ "$MARIADB_CS_NODE" == "UM" && -f "/mnt/config-map/master" ]]; then
 fi
 
 expand_templates /mnt/config-template/start-mariadb-instance.sh >> /mnt/config-map/start-mariadb-instance.sh
+expand_templates /mnt/config-template/preload-azure.sh >> /mnt/config-map/preload-azure.sh
 # expand_templates /mnt/config-template/liveness.sh >> /mnt/config-map/liveness.sh
 # expand_templates /mnt/config-template/readiness.sh >> /mnt/config-map/readiness.sh
 

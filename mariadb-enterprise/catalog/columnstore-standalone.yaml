@@ -101,7 +101,11 @@ spec:
         # start a mariadb instance
         command:
         - bash
+        {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
+        - /mnt/config-map/preload-azure.sh
+        {{- else }}
         - /mnt/config-map/start-mariadb-instance.sh
+        {{- end }}
         env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
           value: "Y"
@@ -123,11 +127,22 @@ spec:
         - name: data
           mountPath: /usr/local/mariadb/columnstore/mysql/db
           subPath: db
+        {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
+        - name: azure
+          mountPath: /azure
+        {{- end }}
       volumes:
       {{- if .Values.mariadb.server.restore.claimName }}
       - name: backup-data-storage
         persistentVolumeClaim:
           claimName: {{ .Values.mariadb.server.restore.claimName }}
+      {{- end }}
+      {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
+      - name: azure
+        azureFile:
+          secretName: {{ .Release.Name }}-mariadb-secret-azure
+          shareName: {{ .Values.mariadb.azure.shareName }}
+          readOnly: false
       {{- end }}
       - name: mariadb-entrypoint-vol
         emptyDir: {}
