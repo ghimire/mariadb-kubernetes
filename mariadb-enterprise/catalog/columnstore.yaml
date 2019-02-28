@@ -157,6 +157,10 @@ spec:
         - name: data
           mountPath: /usr/local/mariadb/columnstore/mysql/db
           subPath: db
+        {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
+        - name: azure
+          mountPath: /azure
+        {{- end }}
         # livenessProbe:
         #   exec:
         #     command:
@@ -178,6 +182,13 @@ spec:
       - name: backup-data-storage
         persistentVolumeClaim:
           claimName: {{ .Values.mariadb.server.restore.claimName }}
+      {{- end }}
+      {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
+      - name: azure
+        azureFile:
+          secretName: {{ .Release.Name }}-mariadb-secret-azure
+          shareName: {{ .Values.mariadb.azure.shareName }}
+          readOnly: false
       {{- end }}
       - name: mariadb-entrypoint-vol
         emptyDir: {}
