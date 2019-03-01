@@ -104,8 +104,8 @@ spec:
           - /mnt/config-template/init-configurations.sh
           - columnstore
         env:
-          - name: BACKUP_CLAIM_NAME
-            value: {{ .Values.mariadb.server.backup.claimName }}
+          - name: BACKUP_RESTORE_FROM
+            value: {{ .Values.mariadb.server.backup.restoreFrom }}
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
           - name: MARIADB_CS_NODE
@@ -161,9 +161,9 @@ spec:
             memory: {{ .Values.mariadb.server.resources.limits.memory }}
             {{- end }}
         volumeMounts:
-        {{- if .Values.mariadb.server.backup.claimName }}
+        {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
-          mountPath: /backup
+          mountPath: /backup-storage
         {{- end }}
         - name: mariadb-entrypoint-vol
           mountPath: /docker-entrypoint-initdb.d
@@ -190,10 +190,15 @@ spec:
         #   periodSeconds: 2
         #   timeoutSeconds: 1
       volumes:
-      {{- if .Values.mariadb.server.backup.claimName }}
+      {{- if .Values.mariadb.server.backup.nfs.server }}
       - name: backup-data-storage
-        persistentVolumeClaim:
-          claimName: {{ .Values.mariadb.server.backup.claimName }}
+        nfs:
+          server: {{ .Values.mariadb.server.backup.nfs.server }}
+          path: {{ .Values.mariadb.server.backup.nfs.path }}
+        capacity:
+          storage: 1Mi
+        accessModes:
+          - ReadWriteMany
       {{- end }}
       - name: mariadb-entrypoint-vol
         emptyDir: {}
@@ -286,8 +291,8 @@ spec:
           - /mnt/config-template/init-configurations.sh
           - columnstore
         env:
-          - name: BACKUP_CLAIM_NAME
-            value: {{ .Values.mariadb.server.backup.claimName }}
+          - name: BACKUP_RESTORE_FROM
+            value: {{ .Values.mariadb.server.backup.restoreFrom }}
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
           - name: MARIADB_CS_NODE
@@ -343,9 +348,9 @@ spec:
             memory: {{ .Values.mariadb.server.resources.limits.memory }}
             {{- end }}
         volumeMounts:
-        {{- if .Values.mariadb.server.backup.claimName }}
+        {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
-          mountPath: /backup
+          mountPath: /backup-storage
         {{- end }}
         - name: mariadb-entrypoint-vol
           mountPath: /docker-entrypoint-initdb.d
@@ -380,10 +385,15 @@ spec:
             name: mariadb-configtemplate-vol
       restartPolicy: Always
       volumes:
-      {{- if .Values.mariadb.server.backup.claimName }}
+      {{- if .Values.mariadb.server.backup.nfs.server }}
       - name: backup-data-storage
-        persistentVolumeClaim:
-          claimName: {{ .Values.mariadb.server.backup.claimName }}
+        nfs:
+          server: {{ .Values.mariadb.server.backup.nfs.server }}
+          path: {{ .Values.mariadb.server.backup.nfs.path }}
+        capacity:
+          storage: 1Mi
+        accessModes:
+          - ReadWriteMany
       {{- end }}
       - name: mariadb-entrypoint-vol
         emptyDir: {}

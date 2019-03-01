@@ -37,7 +37,6 @@ mariadb:
         server: null                             # NFS server hostname or ip
         path: /                                  # NFS path to mount
       restoreFrom: null                          # name of restore subdirectory
-      claimName: null
 
 # maxscale parameters
   maxscale:
