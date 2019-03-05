@@ -1,0 +1,8 @@
+{{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+- name: metrics
+  image: {{ .Values.mariadb.maxscale.monitoring.image }}
+  imagePullPolicy: "IfNotPresent"
+  ports:
+  - name: metrics
+    containerPort: 9195
+{{- end }}

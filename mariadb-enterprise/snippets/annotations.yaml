@@ -1,9 +1,9 @@
 {{- if or (.Values.mariadb.cluster.annotations) (.Values.mariadb.server.annotations) }}
 annotations:
-{{- end }}
 {{- if .Values.mariadb.cluster.annotations }}
 {{ toYaml .Values.mariadb.cluster.annotations | indent 2 }}
 {{- end }}
 {{- if .Values.mariadb.server.annotations }}
 {{ toYaml .Values.mariadb.server.annotations | indent 2 }}
+{{- end }}
 {{- end }}

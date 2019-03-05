@@ -53,14 +53,18 @@ spec:
       labels:
         mariadb: {{ .Release.Name }}
         maxscale.mariadb: {{ .Release.Name }}
-      {{- if or (.Values.mariadb.cluster.annotations) (.Values.mariadb.maxscale.annotations) }}
+      {{- if or (.Values.mariadb.cluster.annotations) (.Values.mariadb.maxscale.annotations) (eq .Values.mariadb.cluster.monitoring.mode "global") }}
       annotations:
+      {{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9195"
       {{- end }}
       {{- if .Values.mariadb.cluster.annotations }}
 {{ toYaml .Values.mariadb.cluster.annotations | indent 8 }}
       {{- end }}
       {{- if .Values.mariadb.maxscale.annotations }}
 {{ toYaml .Values.mariadb.maxscale.annotations | indent 8 }}
+      {{- end }}
       {{- end }}
     spec:
       initContainers:
@@ -126,6 +130,7 @@ spec:
           - name: mariadb-configtemplate-vol
             mountPath: /mnt/config-template
 
+{{ tpl (.Files.Get "snippets/monitoring-maxscale.yaml") . | indent 6 }}
       restartPolicy: Always
 
       volumes:

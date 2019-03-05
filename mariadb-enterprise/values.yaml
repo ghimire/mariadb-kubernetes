@@ -7,6 +7,9 @@ mariadb:
     topology: masterslave                        # possible values "masterslave", "standalone", "galera", "columnstore", "columnstore-standalone" 
     labels: null                                 # custom labels to be added to the mariadb service, e.g. for discovery   
     annotations: null                            # custom annotations to be added to each pod in the cluster
+    monitoring:
+      mode: "global"                             # global for integration with a cluster-wide Prometheus server that does Kubernetes SD on Pods, use none to turn off 
+      provider: "prometheus"                     # for future extensibility 
 
   # server parameters
   server:
@@ -35,6 +38,8 @@ mariadb:
     restore:
       restoreFrom: null                          # name of restore subdirectory
       claimName: null
+    monitoring:
+      image: prom/mysqld-exporter:v0.11.0
 
   # maxscale parameters
   maxscale:
@@ -52,6 +57,8 @@ mariadb:
       limits:
         cpu: null     # e.g. "3000m"
         memory: null  # e.g. "9G"
+    monitoring:
+      image: skord/maxscale_exporter:latest
 
   # statestore parameters
   statestore:

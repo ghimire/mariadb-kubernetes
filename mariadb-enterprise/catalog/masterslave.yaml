@@ -27,7 +27,7 @@ spec:
       labels:
 {{ tpl (.Files.Get "snippets/labels.yaml") . | indent 8 }}
         server.mariadb: {{ .Release.Name }}
-{{ tpl (.Files.Get "snippets/annotations.yaml") . | indent 6 }}
+{{ tpl (.Files.Get "snippets/annotations-pod.yaml") . | indent 6 }}
     spec:
       initContainers:
 {{ tpl (.Files.Get "snippets/nfs-delay.yaml") . | indent 6 }}
@@ -120,11 +120,10 @@ spec:
         volumeMounts:
           - name: mariadb-configtemplate-vol
             mountPath: /mnt/config-template
-
 {{ tpl (.Files.Get "snippets/backup.yaml") . | indent 6 }}
+{{ tpl (.Files.Get "snippets/monitoring-server.yaml") . | indent 6 }}
 
       restartPolicy: Always
 
 {{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
-
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
