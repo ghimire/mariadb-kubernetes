@@ -96,6 +96,16 @@ spec:
         {{- end }}
     spec:
       initContainers:
+      - name: init-volume
+        image: {{ .Values.mariadb.columnstore.image }}
+        command:
+          - bash
+          - "-c"
+          - "cd /usr/local/mariadb/columnstore && [ ! -d \"/mnt/columnstore/bin\" ] && tar czvf - * | tar xzvf - -C /mnt/columnstore"
+        volumeMounts:
+          - name: data
+            mountPath: /mnt/columnstore
+
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore-pm
         image: {{ .Values.mariadb.columnstore.image }}
@@ -155,8 +165,7 @@ spec:
           mountPath: /mnt/config-map
         # a permanent volume for data storage
         - name: data
-          mountPath: /usr/local/mariadb/columnstore/mysql/db
-          subPath: db
+          mountPath: /usr/local/mariadb/columnstore
         {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
         - name: azure
           mountPath: /azure
