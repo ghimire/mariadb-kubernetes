@@ -115,9 +115,9 @@ function get_IP_from_ping() {
 server_id=${BASH_REMATCH[1]}
 
 # load backup
-if [[ ! "$BACKUP_CLAIM_NAME" == "" ]]; then
+if [[ ! "$BACKUP_RESTORE_FROM" == "" ]]; then
     if [[ "$MASTER_HOST" == "localhost" ]]; then
-        chown -R mysql:mysql /backup/$RESTORE_FROM_FOLDER
+        chown -R mysql:mysql /backup-storage/$RESTORE_FROM_FOLDER
     fi
 fi
 
