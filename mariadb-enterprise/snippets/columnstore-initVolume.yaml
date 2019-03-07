@@ -1,0 +1,9 @@
+- name: init-volume
+  image: {{ .Values.mariadb.columnstore.image }}
+  command:
+    - bash
+    - "-c"
+    - "cd /usr/local/mariadb/columnstore && [ ! -d \"/mnt/columnstore/etc\" ] && tar czvf - etc | tar xzvf - -C /mnt/columnstore && tar czvf - data | tar xzvf - -C /mnt/columnstore"
+  volumeMounts:
+    - name: data
+      mountPath: /mnt/columnstore

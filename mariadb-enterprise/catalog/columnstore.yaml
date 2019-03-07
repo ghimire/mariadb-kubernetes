@@ -164,11 +164,7 @@ spec:
         - name: mariadb-config-vol
           mountPath: /mnt/config-map
         # a permanent volume for data storage
-{{ range $i, $e := until (int .Values.mariadb.columnstore.pm.replicas) }}
-        - name: data
-          mountPath: /usr/local/mariadb/columnstore/data{{ add $i 1 }}
-          subPath: data{{ add $i 1 }}
-{{ end }}
+{{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
         {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
         - name: azure
           mountPath: /azure
