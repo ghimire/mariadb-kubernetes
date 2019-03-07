@@ -3,7 +3,7 @@
   command:
     - bash
     - "-c"
-    - "cd /usr/local/mariadb/columnstore && [ ! -d \"/mnt/columnstore/etc\" ] && tar czvf - etc | tar xzvf - -C /mnt/columnstore && tar czvf - data | tar xzvf - -C /mnt/columnstore"
+    - "cd /usr/local/mariadb/columnstore  [ ! -d \"/mnt/columnstore/data\" ] && cp -rp /usr/local/mariadb/columnstore/data /mnt/columnstore/"
   volumeMounts:
     - name: data
       mountPath: /mnt/columnstore
