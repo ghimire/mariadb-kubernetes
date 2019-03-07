@@ -3,7 +3,7 @@
   command:
     - bash
     - "-c"
-    - "[ ! -d \"/mnt/columnstore/etc\" ] && rm -rf /mnt/columnstore/data && cp -rp /usr/local/mariadb/columnstore/data /mnt/columnstore/ && rm -rf /mnt/columnstore/local && cp -rp /usr/local/mariadb/columnstore/local /mnt/columnstore/ && cp -rp /usr/local/mariadb/columnstore/etc /mnt/columnstore"
+    - "[ ! -d \"/mnt/columnstore/etc\" ] && rm -rf /mnt/columnstore/data && cp -rp /usr/local/mariadb/columnstore/data /mnt/columnstore/ && rm -rf /mnt/columnstore/local && cp -rp /usr/local/mariadb/columnstore/local /mnt/columnstore/ && rm -rf /mnt/columnstore/mysql && mkdir -p /mnt/columnstore/mysql && chown mysql:mysql /mnt/columnstore/mysql && cp -rp /usr/local/mariadb/columnstore/mysql/db /mnt/columnstore/mysql/ &&cp -rp /usr/local/mariadb/columnstore/etc /mnt/columnstore/"
   volumeMounts:
     - name: data
       mountPath: /mnt/columnstore
