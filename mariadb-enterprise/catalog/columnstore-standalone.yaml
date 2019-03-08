@@ -154,7 +154,22 @@ spec:
       - name: mariadb-secrets-vol
         secret:
           secretName: {{ .Release.Name }}-mariadb-secret
-      - name: temp-data
-        emptyDir: {}
 
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
+# temporary storage for CS UM only
+  - metadata:
+      name: temp-data
+      labels:
+        mariadb: {{ .Release.Name }}
+        storage.mariadb: {{ .Release.Name }}
+        {{- if .Values.mariadb.cluster.id }}
+        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
+        {{- end }}
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: {{ .Values.mariadb.server.storage.size }}
+      {{- if .Values.mariadb.server.storage.class }}
+      storageClassName: {{ .Values.mariadb.server.storage.class }}
+      {{- end }}
