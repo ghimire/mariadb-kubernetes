@@ -166,6 +166,8 @@ spec:
           mountPath: /mnt/config-map
         # a permanent volume for data storage
 {{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
+        - name: temp-data
+          mountPath: /tmp/data
         {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
         - name: azure
           mountPath: /azure
@@ -209,6 +211,8 @@ spec:
       - name: mariadb-secrets-vol
         secret:
           secretName: {{ .Release.Name }}-mariadb-secret
+      - name: temp-data
+        emptyDir: {}
 
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
 
@@ -325,6 +329,8 @@ spec:
           mountPath: /mnt/config-map
         # a permanent volume for data storage
 {{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
+        - name: temp-data
+          mountPath: /tmp/data
         {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
         - name: azure
           mountPath: /azure
@@ -376,5 +382,7 @@ spec:
       - name: mariadb-secrets-vol
         secret:
           secretName: {{ .Release.Name }}-mariadb-secret
+      - name: temp-data
+        emptyDir: {}
 
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
