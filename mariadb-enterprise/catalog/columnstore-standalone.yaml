@@ -94,6 +94,7 @@ spec:
             name: mariadb-configtemplate-vol
           - mountPath: /mnt/config-map
             name: mariadb-config-vol
+{{ tpl ( .Files.Get "snippets/columnstore-initVolume.yaml" ) . | indent 6 }}
       containers:
 #Columnstore Module
       - name: columnstore-module-pm
@@ -123,10 +124,9 @@ spec:
           mountPath: /docker-entrypoint-initdb.d
         - name: mariadb-config-vol
           mountPath: /mnt/config-map
-        # a permanent volume for data storage
-        - name: data
-          mountPath: /usr/local/mariadb/columnstore/mysql/db
-          subPath: db
+ {{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
+        - name: temp-data
+          mountPath: /tmp/data
         {{- if and .Values.mariadb.azure.storageKey .Values.mariadb.azure.accountName .Values.mariadb.azure.shareName }}
         - name: azure
           mountPath: /azure
@@ -154,5 +154,7 @@ spec:
       - name: mariadb-secrets-vol
         secret:
           secretName: {{ .Release.Name }}-mariadb-secret
+      - name: temp-data
+        emptyDir: {}
 
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
