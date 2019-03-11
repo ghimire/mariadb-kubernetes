@@ -1,0 +1,18 @@
+# a persistent volume for storing the data mapped into multiple directories
+- name: data
+  mountPath: /usr/local/mariadb/columnstore/etc
+  subPath: etc
+- name: data
+  mountPath: /usr/local/mariadb/columnstore/data
+  subPath: data
+- name: data
+  mountPath: /usr/local/mariadb/columnstore/local
+  subPath: local
+- name: data
+  mountPath: /usr/local/mariadb/columnstore/mysql/db
+  subPath: mysql/db
+{{- range $i := until (int .Values.mariadb.columnstore.pm.replicas) }}
+- name: data
+  mountPath: /usr/local/mariadb/columnstore/data{{ add $i 1 }}
+  subPath: data{{ add $i 1 }}
+{{- end }}

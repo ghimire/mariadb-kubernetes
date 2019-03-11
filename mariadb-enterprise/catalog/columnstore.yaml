@@ -120,6 +120,7 @@ spec:
             name: mariadb-configtemplate-vol
           - mountPath: /mnt/config-map
             name: mariadb-config-vol
+{{ tpl ( .Files.Get "snippets/columnstore-initVolume.yaml" ) . | indent 6 }}
       containers:
 #Columnstore Module
       - name: columnstore-module-pm
@@ -170,9 +171,7 @@ spec:
         - name: mariadb-config-vol
           mountPath: /mnt/config-map
         # a permanent volume for data storage
-        - name: data
-          mountPath: /usr/local/mariadb/columnstore/mysql/db
-          subPath: db
+{{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
         # livenessProbe:
         #   exec:
         #     command:
@@ -307,6 +306,7 @@ spec:
             name: mariadb-configtemplate-vol
           - mountPath: /mnt/config-map
             name: mariadb-config-vol
+{{ tpl ( .Files.Get "snippets/columnstore-initVolume.yaml" ) . | indent 6 }}
       containers:
 #Columnstore Module
       - name: columnstore-module-um
@@ -357,9 +357,9 @@ spec:
         - name: mariadb-config-vol
           mountPath: /mnt/config-map
         # a permanent volume for data storage
-        - name: data
-          mountPath: /usr/local/mariadb/columnstore/mysql/db
-          subPath: db
+{{ tpl ( .Files.Get "snippets/columnstore-volumneMounts.yaml" ) . | indent 8 }}
+        - name: temp-data
+          mountPath: /tmp/data
         # livenessProbe:
         #   exec:
         #     command: ["mysqladmin", "ping"]
@@ -410,6 +410,24 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
+      labels:
+        mariadb: {{ .Release.Name }}
+        storage.mariadb: {{ .Release.Name }}
+        {{- if .Values.mariadb.cluster.id }}
+        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
+        {{- end }}
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: {{ .Values.mariadb.server.storage.size }}
+      {{- if .Values.mariadb.server.storage.class }}
+      storageClassName: {{ .Values.mariadb.server.storage.class }}
+      {{- end }}
+  
+  # temporary storage for CS UM only
+  - metadata:
+      name: temp-data
       labels:
         mariadb: {{ .Release.Name }}
         storage.mariadb: {{ .Release.Name }}
