@@ -23,10 +23,10 @@ spec:
   ports:
   - name: maxscale-readwrite
     port: {{ .Values.mariadb.maxscale.ports.readwrite }}
-    targetPort: {{ .Values.mariadb.maxscale.ports.readwrite }}
+    targetPort: 4006
   - name: maxscale-readonly
     port: {{ .Values.mariadb.maxscale.ports.readonly }}
-    targetPort: {{ .Values.mariadb.maxscale.ports.readonly }}
+    targetPort: 4008
   selector:
     maxscale.mariadb: {{ .Release.Name }}
 ---
@@ -93,8 +93,8 @@ spec:
         - --configdir=/etc/maxscale-cfg
         - -lstdout
         ports:
-        - containerPort: {{ .Values.mariadb.maxscale.ports.readonly }}
-        - containerPort: {{ .Values.mariadb.maxscale.ports.readwrite }}
+        - containerPort: 4008
+        - containerPort: 4006
         {{- if or (.Values.mariadb.maxscale.resources.limits.cpu) (.Values.mariadb.maxscale.resources.limits.memory) (.Values.mariadb.maxscale.resources.requests.cpu) (.Values.mariadb.maxscale.resources.requests.memory) }}
         resources:
         {{- end }}

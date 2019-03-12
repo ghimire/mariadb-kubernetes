@@ -27,7 +27,7 @@ spec:
   ports:
   - name: mariadb
     port: {{ .Values.mariadb.server.port }}
-    targetPort: {{ .Values.mariadb.server.port }}
+    targetPort: 3306
   - name: backup
     port: 80
     targetPort: 80

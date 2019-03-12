@@ -18,7 +18,7 @@ spec:
   ports:
   - name: mariadb
     port: {{ .Values.mariadb.server.port }}
-    targetPort: {{ .Values.mariadb.server.port }}
+    targetPort: 3306
   {{- if .Values.mariadb.service.loadBalancer }}
   type: LoadBalancer
   {{- else }}
