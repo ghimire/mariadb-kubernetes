@@ -357,7 +357,7 @@ spec:
         - name: mariadb-config-vol
           mountPath: /mnt/config-map
         # a permanent volume for data storage
-{{ tpl ( .Files.Get "snippets/columnstore-volumneMounts.yaml" ) . | indent 8 }}
+{{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
         - name: temp-data
           mountPath: /tmp/data
         # livenessProbe:
