@@ -1,7 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
+  {{- if eq .Values.mariadb.cluster.topology "standalone" }}
   name: {{ .Release.Name }}-mariadb
+  {{- else }}
+  name: {{ .Release.Name }}-mdb-clust
+  {{- end }}
   labels:
     mariadb: {{ .Release.Name }}
     entrypoint.mariadb: {{ .Release.Name }}
@@ -15,14 +19,21 @@ metadata:
 {{ toYaml .Values.mariadb.server.labels | indent 4 }}
     {{- end }}
 spec:
-  ports:
-  - name: mariadb
-    port: {{ .Values.mariadb.server.port }}
-    targetPort: {{ .Values.mariadb.server.port }}
-  {{- if .Values.mariadb.service.loadBalancer }}
+  {{- if and (eq .Values.mariadb.cluster.topology "standalone") .Values.mariadb.service.loadBalancer }}
   type: LoadBalancer
   {{- else }}
   clusterIP: None
   {{- end }}
+  ports:
+  - name: mariadb
+    port: {{ .Values.mariadb.server.port }}
+    targetPort: {{ .Values.mariadb.server.port }}
+  - name: backup
+    port: 80
+    targetPort: 80
   selector:
-    um.mariadb: {{ .Release.Name }}
+  {{- if or (eq .Values.mariadb.cluster.topology "standalone") (eq .Values.mariadb.cluster.topology "masterslave") (eq .Values.mariadb.cluster.topology "galera") }}
+    server.mariadb: {{ .Release.Name }}
+  {{- else }}
+    csnode.mariadb: {{ .Release.Name }}
+  {{- end }}

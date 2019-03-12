@@ -1,6 +1,8 @@
 #!/bin/sh
 
-if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]] || [[ "$CLUSTER_TOPOLOGY" == "masterslave" ]]; then
+if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]]; then
+    URL=$RELEASE_NAME-mdb-ms-0.$RELEASE_NAME-mariadb
+elif [[ "$CLUSTER_TOPOLOGY" == "masterslave" ]]; then
     URL=$RELEASE_NAME-mdb-ms-0.$RELEASE_NAME-mdb-clust
 elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     URL=$RELEASE_NAME-mdb-galera-0.$RELEASE_NAME-mdb-clust

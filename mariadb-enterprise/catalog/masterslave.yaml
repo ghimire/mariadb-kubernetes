@@ -6,7 +6,7 @@
 # kubectl scale sts <label>-mdb-ms --replicas=<number of server instances>
 
 # Headless service for stable DNS entries for StatefulSet members
-{{ tpl (.Files.Get "snippets/external-service.yaml") . }}
+{{ tpl (.Files.Get "snippets/internal-service.yaml") . }}
 ---
 # a StatefulSet for the master/slave cluster
 apiVersion: apps/v1

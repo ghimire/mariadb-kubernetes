@@ -17,6 +17,9 @@ metadata:
     id.mariadb: "{{ .Values.mariadb.cluster.id }}"
     {{- end }}
 spec:
+  {{- if .Values.mariadb.service.loadBalancer }}
+  type: LoadBalancer
+  {{- end }}
   ports:
   - name: maxscale-readwrite
     port: {{ .Values.mariadb.maxscale.ports.readwrite }}

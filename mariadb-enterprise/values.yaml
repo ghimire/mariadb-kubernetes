@@ -4,7 +4,7 @@ mariadb:
   # general cluster parameters
   cluster:
     id: null                                     # e.g. "1"
-    topology: masterslave                        # possible values "masterslave", "standalone", "galera", "columnstore", "columnstore-standalone" 
+    topology: masterslave                        # possible values "masterslave", "standalone", "galera", "columnstore", "columnstore-standalone"
     labels: null                                 # custom labels to be added to the mariadb service, e.g. for discovery   
     annotations: null                            # custom annotations to be added to each pod in the cluster
 
@@ -56,6 +56,9 @@ mariadb:
   # statestore parameters
   statestore:
     image: mariadb/statestore:0.0.3
+
+  service:
+    loadBalancer: true                          # if "true", the service will be of type LoadBalancer and will have external IP
 
   # columnstore cluster parameters
   columnstore:
