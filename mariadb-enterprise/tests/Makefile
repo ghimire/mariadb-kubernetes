@@ -21,3 +21,6 @@ test: push-image
 
 benchmark: push-image
 	build/kubernetes-run.sh "$(MARIADB_CLUSTER)" "$(IMAGE):$(VERSION)" sysbench $(THREADS)
+
+infrastructure-test: 
+	infrastructure/test.py "$(MARIADB_CLUSTER)"
