@@ -252,6 +252,7 @@ The following list of parameters can be used with the helm chart by either modif
 | mariadb.backup.target.path             | /                        | Backup NFS server path to mount (only if type is `nfs`)                                                                                     |
 | mariadb.backup.schedule             | null                        | Backup schedule in crontab format                                                                                     |
 | mariadb.backup.image             | gcr.io/dbaas-development/mariadb-operator-python:0.0.1                        | The backup container image                                                                                     |
+| mariadb.service.loadBalancer             | false                        | will create a service of type "LoadBalancer", which should create and external IP
 
 Refer to [https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container) for the definition of resource requests and limits.
 

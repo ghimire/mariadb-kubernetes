@@ -4,57 +4,10 @@
 # a headless service. 
 
 # external entrypoint
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-mariadb
-  labels:
-    mariadb: {{ .Release.Name }}
-    entrypoint.mariadb: {{ .Release.Name }}
-    {{- if .Values.mariadb.cluster.id }}
-    id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-    {{- end }}
-    {{- if .Values.mariadb.cluster.labels }}
-{{ toYaml .Values.mariadb.cluster.labels | indent 4 }}
-    {{- end }}
-    {{- if .Values.mariadb.server.labels }}
-{{ toYaml .Values.mariadb.server.labels | indent 4 }}
-    {{- end }}
-spec:
-  ports:
-  - name: mariadb
-    port: {{ .Values.mariadb.server.port }}
-    targetPort: {{ .Values.mariadb.server.port }}
-  clusterIP: None
-  selector:
-    um.mariadb: {{ .Release.Name }}
-
+{{ tpl (.Files.Get "snippets/external-service.yaml") . }}
 ---
 # Headless service for stable DNS entries for StatefulSet members
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-mdb-clust
-  labels:
-    mariadb: {{ .Release.Name }}
-    {{- if .Values.mariadb.cluster.id }}
-    id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-    {{- end }}
-    {{- if .Values.mariadb.cluster.labels }}
-{{ toYaml .Values.mariadb.cluster.labels | indent 4 }}
-    {{- end }}
-    {{- if .Values.mariadb.server.labels }}
-{{ toYaml .Values.mariadb.server.labels | indent 4 }}
-    {{- end }}
-spec:
-  ports:
-  - name: mariadb
-    port: {{ .Values.mariadb.server.port }}
-    targetPort: {{ .Values.mariadb.server.port }}
-  clusterIP: None
-  selector:
-    csnode.mariadb: {{ .Release.Name }}
-
+{{ tpl (.Files.Get "snippets/internal-service.yaml") . }}
 ---
 # a StatefulSet for the columnstore PMs
 apiVersion: apps/v1

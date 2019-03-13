@@ -4,7 +4,7 @@
 # replicas should always be 1.
 
 # External service
-{{ tpl (.Files.Get "snippets/external-service.yaml") . }}
+{{ tpl (.Files.Get "snippets/internal-service.yaml") . }}
 ---
 # a StatefulSet for the master/slave cluster
 apiVersion: apps/v1
@@ -18,7 +18,7 @@ spec:
   selector:
     matchLabels:
       server.mariadb: {{ .Release.Name }}
-  serviceName: {{ .Release.Name }}-mdb-clust
+  serviceName: {{ .Release.Name }}-mariadb
   replicas: 1
   template:
     metadata:
@@ -80,7 +80,7 @@ spec:
         - name: CLUSTER_TOPOLOGY
           value: {{ .Values.mariadb.cluster.topology }}
         ports:
-        - containerPort: {{ .Values.mariadb.server.port }}
+        - containerPort: 3306
 {{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
         - name: backup-data-storage
