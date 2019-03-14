@@ -38,27 +38,40 @@ def determineTopology():
 
 
 def waitForColumnStoreActive(umPod):
-    print("waiting for the UM pod to be active")
+    print("waiting for the um pod " + umPod.metadata.name + " to be active")
     i = 0
-    while i < 60:
-        resp = v1.read_namespaced_pod(name=umPod.metadata.name, namespace=umPod.metadata.namespace)
-        print(resp)
-        if resp.status.phase == 'Running':
-            break
-        time.sleep(1)
-        i += 1
-    if i >= 60:
+    brk = False
+    while i < 120:
+        try:
+            resp = v1.read_namespaced_pod(name=umPod.metadata.name, namespace=umPod.metadata.namespace)
+            if resp.status.phase == 'Running' and resp.metadata.deletion_timestamp == None:
+                for item in resp.status.container_statuses:
+                    if item.name == 'columnstore-module-um':
+                        if item.state.running != None:
+                            brk = True
+            if brk:
+                break
+            time.sleep(1)
+            i += 1
+        except:
+            time.sleep(1)
+            i += 1
+    if i >= 120:
         print("error: um pod timed out")
         sys.exit(2)
-    print("um pod active")
+    print("um pod " + umPod.metadata.name + " active\nwaiting for the ColumnStore system to be active")
     i = 0
     exec_command = [ '/usr/local/mariadb/columnstore/bin/mcsadmin', 'getSystemStatus' ]
     while i < 120:
-        resp = stream(v1.connect_get_namespaced_pod_exec, umPod.metadata.name, umPod.metadata.namespace, command=exec_command, container='columnstore-module-um', stderr=True, stdin=False, stdout=True, tty=False)
-        if 'System        ACTIVE' in resp:
-            break
-        time.sleep(1)
-        i += 1
+        try:
+            resp = stream(v1.connect_get_namespaced_pod_exec, umPod.metadata.name, umPod.metadata.namespace, command=exec_command, container='columnstore-module-um', stderr=True, stdin=False, stdout=True, tty=False)
+            if 'System        ACTIVE' in resp:
+                break
+            time.sleep(1)
+            i += 1
+        except:
+            time.sleep(1)
+            i += 1
     if i >= 120:
         print("error: ColumnStore system start timed out")
         sys.exit(2)
@@ -66,34 +79,40 @@ def waitForColumnStoreActive(umPod):
 
 
 def testStatefulSet():
+    print("starting StatefulSet test")
     umPods = v1.list_pod_for_all_namespaces(watch=False, label_selector="mariadb=%s,um.mariadb" % (MARIADB_CLUSTER,))
     pmPods = v1.list_pod_for_all_namespaces(watch=False, label_selector="mariadb=%s,pm.mariadb" % (MARIADB_CLUSTER,))
     umPod = umPods.items[0]
     waitForColumnStoreActive(umPod)
      
     # Create a sample table
-    exec_command = [ '/usr/local/mariadb/columnstore/mysql/bin/mysql', '--defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf', '-u root', '-e CREATE TABLE IF NOT EXISTS tmp1 (i int) engine=columnstore', 'test' ]
+    print("injecting data into ColumnStore")
+    exec_command = [ '/usr/local/mariadb/columnstore/mysql/bin/mysql', '--defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf', '-u', 'root', '-e', 'CREATE TABLE IF NOT EXISTS tmp1 (v varchar(8)) engine=columnstore', 'test' ]
     stream(v1.connect_get_namespaced_pod_exec, umPod.metadata.name, umPod.metadata.namespace, command=exec_command, container='columnstore-module-um', stderr=True, stdin=False, stdout=True, tty=False)
-    exec_command = [ '/usr/local/mariadb/columnstore/mysql/bin/mysql', '--defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf', '-u root', '-e INSERT INTO tmp1 VALUES (42)', 'test' ]
+    exec_command = [ '/usr/local/mariadb/columnstore/mysql/bin/mysql', '--defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf', '-u', 'root', '-e', 'INSERT INTO tmp1 VALUES ("fortytwo")', 'test' ]
     stream(v1.connect_get_namespaced_pod_exec, umPod.metadata.name, umPod.metadata.namespace, command=exec_command, container='columnstore-module-um', stderr=True, stdin=False, stdout=True, tty=False)
     
     # Restart all nodes
     print("terminating ColumnStore pods")
-    for pmPod in pmPods.items:
-        v1.delete_namespaced_pod(pmPod.metadata.name, pmPod.metadata.namespace, body=kubernetes.client.V1DeleteOptions())
     for umPod in umPods.items:
-        v1.delete_namespaced_pod(umPod.metadata.name, umPod.metadata.namespace, body=kubernetes.client.V1DeleteOptions())
+        v1.delete_namespaced_pod(umPod.metadata.name, umPod.metadata.namespace, body=kubernetes.client.V1DeleteOptions(), grace_period_seconds=0)
+    for pmPod in pmPods.items:
+        v1.delete_namespaced_pod(pmPod.metadata.name, pmPod.metadata.namespace, body=kubernetes.client.V1DeleteOptions(), grace_period_seconds=0)
     
     # Verify that the content is still available
-    time.sleep(30)
-    umPods = v1.list_pod_for_all_namespaces(watch=False, label_selector="mariadb=%s,um.mariadb" % (MARIADB_CLUSTER,))
-    umPod = umPods.items[0]
     waitForColumnStoreActive(umPod)
-    exec_command = [ '/usr/local/mariadb/columnstore/mysql/bin/mysql', '--defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf', '-u root', '-e SELECT * FROM tmp1', 'test' ]
+    print("validating injected data")
+    exec_command = [ '/usr/local/mariadb/columnstore/mysql/bin/mysql', '--defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf', '-u', 'root', '-e', 'SELECT * FROM tmp1', 'test' ]
     resp = stream(v1.connect_get_namespaced_pod_exec, umPod.metadata.name, umPod.metadata.namespace, command=exec_command, container='columnstore-module-um', stderr=True, stdin=False, stdout=True, tty=False)
-    if '42' not in resp:
-        print("error: the injected value of 42 was not found in the restartet ColumnStore cluster table test.tmp1")
+    if 'fortytwo' not in resp:
+        print(resp)
+        print("error: the injected value of 'fortytwo' was not found in the restartet ColumnStore cluster table test.tmp1")
         sys.exit(2)
+    print("StatefulSet test passed")
+
+    # Clean up the database
+    exec_command = [ '/usr/local/mariadb/columnstore/mysql/bin/mysql', '--defaults-extra-file=/usr/local/mariadb/columnstore/mysql/my.cnf', '-u', 'root', '-e', 'DROP TABLE IF EXISTS tmp1', 'test' ]
+    stream(v1.connect_get_namespaced_pod_exec, umPod.metadata.name, umPod.metadata.namespace, command=exec_command, container='columnstore-module-um', stderr=True, stdin=False, stdout=True, tty=False)
 
 
 def main():
