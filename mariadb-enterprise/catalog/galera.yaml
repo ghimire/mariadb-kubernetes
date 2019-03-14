@@ -125,6 +125,10 @@ spec:
           value: {{ .Values.mariadb.server.backup.restoreFrom }}
         - name: CLUSTER_TOPOLOGY
           value: {{ .Values.mariadb.cluster.topology }}
+        - name: DWAPI_PODIP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         ports:
         - containerPort: 3306
         {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
