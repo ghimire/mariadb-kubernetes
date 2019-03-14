@@ -1,0 +1,5 @@
+mcsadmin getModuleDisk
+mcsadmin getModuleResourceUsage
+mcaadmin getStorageStatus
+mcsadmin getSystemDisk
+mcsadmin getSystemResourceUsage

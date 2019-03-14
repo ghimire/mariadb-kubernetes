@@ -1,0 +1,115 @@
+[mariadb-user@ip-172-31-40-142 ~]$ mcsadmin getsystemi
+getsysteminfo   Fri Oct 12 04:19:32 2018
+
+System columnstore-1
+
+System and Module statuses
+
+Component     Status                       Last Status Change
+------------  --------------------------   ------------------------
+System        ACTIVE                       Fri Oct 12 04:18:29 2018
+
+Module um1    ACTIVE                       Fri Oct 12 04:18:28 2018
+Module pm1    ACTIVE                       Fri Oct 12 04:17:59 2018
+Module pm2    ACTIVE                       Fri Oct 12 04:18:08 2018
+Module pm3    ACTIVE                       Fri Oct 12 04:18:13 2018
+Module pm4    ACTIVE                       Fri Oct 12 04:18:18 2018
+
+Active Parent OAM Performance Module is 'pm1'
+
+MariaDB ColumnStore Process statuses
+
+Process             Module    Status            Last Status Change        Process ID
+------------------  ------    ---------------   ------------------------  ----------
+ProcessMonitor      um1       ACTIVE            Fri Oct 12 04:17:43 2018       14129
+ServerMonitor       um1       ACTIVE            Fri Oct 12 04:17:58 2018       14576
+DBRMWorkerNode      um1       ACTIVE            Fri Oct 12 04:17:58 2018       14589
+ExeMgr              um1       ACTIVE            Fri Oct 12 04:18:21 2018       17804
+DDLProc             um1       ACTIVE            Fri Oct 12 04:18:25 2018       17843
+DMLProc             um1       ACTIVE            Fri Oct 12 04:18:29 2018       17877
+mysqld              um1       ACTIVE            Fri Oct 12 04:18:20 2018       14515
+
+ProcessMonitor      pm1       ACTIVE            Fri Oct 12 04:16:58 2018       46057
+ProcessManager      pm1       ACTIVE            Fri Oct 12 04:17:04 2018       46270
+DBRMControllerNode  pm1       ACTIVE            Fri Oct 12 04:17:51 2018       47825
+ServerMonitor       pm1       ACTIVE            Fri Oct 12 04:17:53 2018       47846
+DBRMWorkerNode      pm1       ACTIVE            Fri Oct 12 04:17:53 2018       47897
+DecomSvr            pm1       ACTIVE            Fri Oct 12 04:17:57 2018       48121
+PrimProc            pm1       ACTIVE            Fri Oct 12 04:17:59 2018       48246
+WriteEngineServer   pm1       ACTIVE            Fri Oct 12 04:18:00 2018       48321
+
+ProcessMonitor      pm2       ACTIVE            Fri Oct 12 04:17:44 2018        8271
+ProcessManager      pm2       HOT_STANDBY       Fri Oct 12 04:17:45 2018        8386
+DBRMControllerNode  pm2       COLD_STANDBY      Fri Oct 12 04:17:59 2018
+ServerMonitor       pm2       ACTIVE            Fri Oct 12 04:18:02 2018        8437
+DBRMWorkerNode      pm2       ACTIVE            Fri Oct 12 04:18:02 2018        8450
+DecomSvr            pm2       ACTIVE            Fri Oct 12 04:18:06 2018        8468
+PrimProc            pm2       ACTIVE            Fri Oct 12 04:18:08 2018        8478
+WriteEngineServer   pm2       ACTIVE            Fri Oct 12 04:18:09 2018        8487
+
+ProcessMonitor      pm3       ACTIVE            Fri Oct 12 04:17:46 2018        7869
+ProcessManager      pm3       COLD_STANDBY      Fri Oct 12 04:18:04 2018
+DBRMControllerNode  pm3       COLD_STANDBY      Fri Oct 12 04:18:04 2018
+ServerMonitor       pm3       ACTIVE            Fri Oct 12 04:18:07 2018        8044
+DBRMWorkerNode      pm3       ACTIVE            Fri Oct 12 04:18:07 2018        8057
+DecomSvr            pm3       ACTIVE            Fri Oct 12 04:18:11 2018        8073
+PrimProc            pm3       ACTIVE            Fri Oct 12 04:18:13 2018        8083
+WriteEngineServer   pm3       ACTIVE            Fri Oct 12 04:18:14 2018        8091
+
+ProcessMonitor      pm4       ACTIVE            Fri Oct 12 04:17:48 2018        7852
+ProcessManager      pm4       COLD_STANDBY      Fri Oct 12 04:18:09 2018
+DBRMControllerNode  pm4       COLD_STANDBY      Fri Oct 12 04:18:09 2018
+ServerMonitor       pm4       ACTIVE            Fri Oct 12 04:18:12 2018        8007
+DBRMWorkerNode      pm4       ACTIVE            Fri Oct 12 04:18:12 2018        8019
+DecomSvr            pm4       ACTIVE            Fri Oct 12 04:18:16 2018        8036
+PrimProc            pm4       ACTIVE            Fri Oct 12 04:18:18 2018        8045
+WriteEngineServer   pm4       ACTIVE            Fri Oct 12 04:18:19 2018        8054
+
+Active Alarm Counts: Critical = 0, Major = 3, Minor = 0, Warning = 0, Info = 0
+
+[mysql@pm1 columnstore]$ mcsadmin getSystemStatus
+getsystemstatus   Thu Oct 11 08:52:23 2018
+
+System columnstore-1
+
+System and Module statuses
+
+Component     Status                       Last Status Change
+------------  --------------------------   ------------------------
+System        DOWN
+
+Module um1    UP                           Thu Oct 11 08:39:07 2018
+Module pm1    UP                           Thu Oct 11 08:39:07 2018
+Module pm2    UP                           Thu Oct 11 08:39:07 2018
+Module pm3    UP                           Thu Oct 11 08:39:07 2018
+Module pm4    UP                           Thu Oct 11 08:39:07 2018
+
+Active Parent OAM Performance Module is 'pm1'
+
+[mariadb-user@ip-172-31-26-232 ~]$ mcsmysql -u root
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 30
+Server version: 10.2.17-MariaDB-log Columnstore 1.1.6-1
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> select mcsSystemReady();
++------------------+
+| mcsSystemReady() |
++------------------+
+|                1 |
++------------------+
+1 row in set (0.01 sec)
+
+MariaDB [(none)]> create database if not exists ssb;
+Query OK, 1 row affected (0.00 sec)
+
+MariaDB [(none)]> select mcsSystemReadOnly();
++---------------------+
+| mcsSystemReadOnly() |
++---------------------+
+|                   0 |
++---------------------+
+1 row in set (0.00 sec)

@@ -1,0 +1,27 @@
+---
+VERSION: 1.0.0.1
+DATABASE: ssb
+USER: gpadmin
+HOST: mdw
+PORT: 5432
+GPLOAD:
+   INPUT:
+    - SOURCE:
+         PORT: 8080
+         FILE:
+           - /ssb/ssb/part.tbl
+         SSL: false
+    - FORMAT: csv
+    - DELIMITER: '|'
+    - HEADER: false
+    - ENCODING: UNICODE
+    - ERROR_LIMIT: 100
+    - LOG_ERRORS: true
+   EXTERNAL:
+      - SCHEMA: orders
+   OUTPUT:
+    - TABLE: orders.part
+    - MODE: insert
+   PRELOAD:
+    - TRUNCATE: true
+    - REUSE_TABLES: true
