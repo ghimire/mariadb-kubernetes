@@ -1,0 +1,13 @@
+# define pod anti-affinities to put best effort in ensuring that no two components of a database cluster run on the same node
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: mariadb
+            operator: In
+            values:
+            - {{ .Release.Name }}
+        topologyKey: kubernetes.io/hostname
