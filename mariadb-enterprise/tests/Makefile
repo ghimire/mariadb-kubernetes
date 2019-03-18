@@ -2,7 +2,7 @@ DOCKER_REPO  ?= gcr.io/dbaas-development
 MARIADB_CLUSTER ?= sa-test
 THREADS ?= 16
 IMAGE_NAME := mariadb-test
-VERSION := 0.0.3
+VERSION := 0.0.4
 IMAGE := $(DOCKER_REPO)/$(IMAGE_NAME)
 
 .PHONY: help
@@ -22,5 +22,5 @@ test: push-image
 benchmark: push-image
 	build/kubernetes-run.sh "$(MARIADB_CLUSTER)" "$(IMAGE):$(VERSION)" sysbench $(THREADS)
 
-infrastructure-test: 
-	infrastructure/test.py "$(MARIADB_CLUSTER)"
+infrastructure-test: push-image
+	build/kubernetes-run.sh "$(MARIADB_CLUSTER)" "$(IMAGE):$(VERSION)" infrastructure
