@@ -345,9 +345,9 @@ You can use an existing backup and load it when starting a new cluster. Restorin
     helm install . --name <release-name> --set mariadb.server.backup.restoreFrom=<backup_path> --set mariadb.server.backup.nfs.server=<nfs_server_ip> --set mariadb.server.backup.nfs.path=<nfs_mount_point>
     ```
 
-## Running Sanity Test and Benchmark tests
+## Running Sanity Test, infrastructure tests and Benchmark tests
 
-The `tests` folder contains support for running sanity-level deployment tests, based on the mysql-test framework (https://mariadb.com/kb/en/library/mysqltest/), and benchmarking, based on sysbench (https://github.com/akopytov/sysbench/tree/1.0), against an existing MariaDB cluster in Kubernetes. Tests can be run using the Unix `make` command.
+The `tests` folder contains support for running sanity-level deployment tests, based on the mysql-test framework (https://mariadb.com/kb/en/library/mysqltest/), and benchmarking, based on sysbench (https://github.com/akopytov/sysbench/tree/1.0), against an existing MariaDB cluster in Kubernetes. It also includes a framework for infrastructure tests to simulate infrastructure failures like node outages. Tests can be run using the Unix `make` command.
 
 ### Pre-requisites
 
@@ -359,6 +359,7 @@ In order to be able to execute the `make` command for running a test or a benchm
 
 Note: before running `make`, ensure that a MariaDB cluster must be created and is in an operational state.
 Note: Sanity tests and benchmarks should only be run against clusters that have at least 5GB of storage available (option `--set mariadb.server.storage.size=5Gi` on the `helm install` command line).
+Note: Infrastructure tests require to be executed in the `testing` namespace with a k8s service account `tester` bound to the (RBAC) role of `admin` in the regarding namespace.
 
 ### Running a Sanity Test
 
@@ -369,6 +370,16 @@ The sanity test loads a simulated Bookstore database (refer to https://github.co
 This will build a docker image, push it into the remote Docker repo and create a pod named `<release-name>-sanity-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute the test framwork. You can track the progress of the test run by running:
 
 ```$ kubectl logs <release-name>-sanity-test -f``` 
+
+### Running the Infrastructure Test
+
+The infrastructure test executes the tests deposited in `infrastructure/global` for every deployed cluster, and specific tests for MariaDB Server and MariaDB ColumnStore clusters respectively from `infrastructure/server` or `infrastructure/columnstore`. Details about those tests can be found in the README.md of these directories. The infrastructure test requires the cluster to test to be started in the `testing` namespace. In order to execute the infrastructure test, execute the following command:
+
+```$ make infrastructure-test MARIADB_CLUSTER=<release-name>```
+
+This will build a docker image, push it into the remote Docker repo and create a pod named `<release-name>-infrastructure-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute the test framwork. You can track the progress of the test run by running:
+
+```$ kubectl logs <release-name>-infrastructure-test -f``` 
 
 ### Running a Benchmark
 
