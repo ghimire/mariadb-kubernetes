@@ -379,7 +379,7 @@ The infrastructure test executes the tests deposited in `infrastructure/global` 
 
 This will build a docker image, push it into the remote Docker repo and create a pod named `<release-name>-infrastructure-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute the test framwork. You can track the progress of the test run by running:
 
-```$ kubectl logs <release-name>-Infrastructure-test -f``` 
+```$ kubectl logs <release-name>-infrastructure-test -f``` 
 
 ### Running a Benchmark
 
