@@ -7,6 +7,7 @@ mariadb:
     topology: masterslave                        # possible values "masterslave", "standalone", "galera", "columnstore", "columnstore-standalone" 
     labels: null                                 # custom labels to be added to the mariadb service, e.g. for discovery   
     annotations: null                            # custom annotations to be added to each pod in the cluster
+    nodeGroup: null                              # a node group X where any pod in the cluster may run, nodes must have the label node.mariadb=X
 
   # server parameters
   server:

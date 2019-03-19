@@ -47,6 +47,7 @@ spec:
         mariadb: {{ .Release.Name }}
         state-store.mariadb: {{ .Release.Name }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       containers:
       - name: state-store
         image: {{ .Values.mariadb.statestore.image }}

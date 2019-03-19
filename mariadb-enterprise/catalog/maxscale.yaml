@@ -63,6 +63,7 @@ spec:
 {{ toYaml .Values.mariadb.maxscale.annotations | indent 8 }}
       {{- end }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       - name: init-maxscale
         image: {{ .Values.mariadb.server.image }}

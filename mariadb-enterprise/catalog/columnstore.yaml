@@ -95,6 +95,7 @@ spec:
         id.mariadb: {{ .Values.mariadb.cluster.id }}
         {{- end }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore-pm
@@ -271,6 +272,7 @@ spec:
         id.mariadb: {{ .Values.mariadb.cluster.id }}
         {{- end }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       ## runs a state store client to determine the IP of the active master
       - name: init-get-um-master

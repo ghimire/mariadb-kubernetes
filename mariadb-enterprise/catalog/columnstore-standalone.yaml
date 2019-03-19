@@ -71,6 +71,7 @@ spec:
         id.mariadb: {{ .Values.mariadb.cluster.id }}
         {{- end }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore
