@@ -11,7 +11,7 @@ Tests need to inherit the `TestTemplate` from `helper_functions.py` and need to 
 Following variables will be inherited from the `TestTemplate` and be ready to use:
 
 | Variable                  | Description                                                                                                                     |
-+---------------------------+---------------------------------------------------------------------------------------------------------------------------------|
+|---------------------------|---------------------------------------------------------------------------------------------------------------------------------|
 | self.MARIADB_CLUSTER      | The cluster release name that is going to be tested                                                                             |
 | self.MARIADB_HOST         | The hostname of the MariaDB SQL service endpoint                                                                                |
 | self.MARIADB_PORT         | The port of the MariaDB SQL service endpoint                                                                                    |
