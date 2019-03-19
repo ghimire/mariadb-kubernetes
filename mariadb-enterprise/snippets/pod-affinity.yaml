@@ -2,7 +2,7 @@
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 100
+    - weight: 10
       podAffinityTerm:
         labelSelector:
           matchExpressions:
@@ -11,3 +11,13 @@ affinity:
             values:
             - {{ .Release.Name }}
         topologyKey: kubernetes.io/hostname
+{{- if .Values.mariadb.cluster.nodeGroup }}
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node.mariadb
+          operator: In
+          values:
+          - {{ .Values.mariadb.cluster.nodeGroup }}
+{{- end }}
