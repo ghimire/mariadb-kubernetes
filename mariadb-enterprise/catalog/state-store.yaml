@@ -20,6 +20,7 @@ metadata:
     id.mariadb: "{{ .Values.mariadb.cluster.id }}"
     {{ end }}
 spec:
+  clusterIP: None
   selector:
     state-store.mariadb: {{ .Release.Name }}
   ports:
