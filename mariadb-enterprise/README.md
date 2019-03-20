@@ -359,7 +359,9 @@ In order to be able to execute the `make` command for running a test or a benchm
 * kubernetes client (v1.9+), configured to access the Kubernetes cluster where MariaDB will runs as cluster admin
 
 Note: before running `make`, ensure that a MariaDB cluster must be created and is in an operational state.
+
 Note: Sanity tests and benchmarks should only be run against clusters that have at least 5GB of storage available (option `--set mariadb.server.storage.size=5Gi` on the `helm install` command line).
+
 Note: Infrastructure tests require to be executed in the `testing` namespace with a k8s service account `tester` bound to the (RBAC) role of `admin` in the regarding namespace.
 
 ### Running a Sanity Test
