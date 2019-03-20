@@ -16,11 +16,11 @@ RUN yum -y  install \
             && yum clean all
 
 RUN cd /ssb-tests/ && make clean && make 
-RUN cd /ssb-tests && ./dbgen -s 150   -T s
-RUN cd /ssb-tests && ./dbgen -s 150   -T p
-RUN cd /ssb-tests && ./dbgen -s 150   -T d
-RUN cd /ssb-tests && ./dbgen -s 150   -T c
-RUN cd /ssb-tests && ./dbgen -s 150   -T l
+RUN cd /ssb-tests && ./dbgen -s 2   -T s
+RUN cd /ssb-tests && ./dbgen -s 2   -T p
+RUN cd /ssb-tests && ./dbgen -s 2   -T d
+RUN cd /ssb-tests && ./dbgen -s 2   -T c
+RUN cd /ssb-tests && ./dbgen -s 2   -T l
 
 ENTRYPOINT ["top", "-b"]
 

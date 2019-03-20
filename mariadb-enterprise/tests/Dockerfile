@@ -1,16 +1,27 @@
-FROM mariadb/server:10.3
+FROM centos:7
 
-# install test dependencies
-RUN apt-get update && apt-get install -y mariadb-test curl python3 python3-pip && pip3 install kubernetes mysql-connector
+CMD ["mkdir /root/ssb"]
+COPY ./ssb/ /root/ssb
+RUN ln -s /root/ssb /ssb-tests
 
-# install sysbench
-RUN curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.deb.sh | bash
-RUN apt-get install -y sysbench
+RUN yum -y  install \
+            mysql \
+            mysql-devel\
+            which \
+            libtool \
+            make \
+            automake \
+            #numactl \
+            #sysstat\
+            && yum clean all
 
-# copy test suites and scripts
-COPY ./test-suite /usr/share/mysql/mysql-test/suite/bookstore
-COPY ./infrastructure ./infrastructure
-COPY ./run-*.sh ./
+RUN cd /ssb-tests/ && make clean && make 
+RUN cd /ssb-tests && ./dbgen -s 2   -T s
+RUN cd /ssb-tests && ./dbgen -s 2   -T p
+RUN cd /ssb-tests && ./dbgen -s 2   -T d
+RUN cd /ssb-tests && ./dbgen -s 2   -T c
+RUN cd /ssb-tests && ./dbgen -s 2   -T l
 
-# run test case
-ENTRYPOINT ["/bin/bash", "./run-tests.sh"]
+ENTRYPOINT ["top", "-b"]
+
+CMD ["-c"]

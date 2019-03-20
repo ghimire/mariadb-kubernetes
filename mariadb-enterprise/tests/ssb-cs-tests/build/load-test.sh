@@ -16,23 +16,24 @@ set -x
 ##################
 
 #K8s resource names
-ssbPod="$1-$2"
+ssbPod=`echo $1-$2 | xargs`  
 umNode="$1-mdb-cs-um-module-0"
 
 #ssb pod extracts path
+ssbPodNfsMnt="/nfs-volume"
 ssbPodPath="/root/ssb"
 
-podNfsMnt="/nfs-volume"
-extDir="ssb"
-
-nfsSSBdir="$podNfsMnt/$extDir"
+#nfsSSBdir="$ssbPodNfsMnt/$ssbExtDir"
 
 #um extracts path
-nfsMnt="/backup-storage"
-nfsMntPath="$nfsMnt/$extDir"
+umNfsMnt="/backup-storage"
+ssbExtDir="ssb"
+umNfsMntPath="$umNfsMnt/$ssbExtDir"
 
 #1Move data from ssb pod to cs um node
 #1.1 Move extract files from ssb pod to nfs mnt dir
+
+cd ssb-cs-tests/ 
 
 #check if ssb pod is ready
 while [[ !("$(kubectl get po "$ssbPod" -o 'jsonpath={.status.conditions[?(@.type=="Ready")].status}')" == 'True') ]]; do
@@ -40,27 +41,27 @@ while [[ !("$(kubectl get po "$ssbPod" -o 'jsonpath={.status.conditions[?(@.type
 		sleep 1 
 done
 
-dircheck=`kubectl exec "$ssbPod" -- ls "$podNfsMnt" | grep "$extDir" | wc -l | xargs`
-echo $dircheck
-if [[ "$dircheck">"0" ]]; then
-    kubectl exec "$ssbPod" -- rm -rf "$nfsSSBdir" &
-    wait
-fi
-kubectl exec "$ssbPod" -- cp -a "$ssbPodPath" "$podNfsMnt"
+#dircheck=`kubectl exec "$ssbPod" -- ls "$ssbPodNfsMnt" | grep "$ssbExtDir" | wc -l | xargs`
+#echo $dircheck
+#if [[ "$dircheck">"0" ]]; then
+#    kubectl exec "$ssbPod" -- rm -rf "$nfsSSBdir" &
+#    wait
+#fi
+kubectl exec "$ssbPod" -- cp -a "$ssbPodPath" "$ssbPodNfsMnt"
 
 #1.2 Move extracts from nfs server to um 
-dircheck=`kubectl exec -it "$umNode"  -- ls / | grep "$extDir" | wc -l | xargs`
+#dircheck=`kubectl exec -it "$umNode"  -- ls / | grep "$ssbExtDir" | wc -l | xargs`
 
-if [[ "$dircheck" > "0" ]]; then
-  echo 1
-  kubectl exec "$umNode" -c columnstore-module-um -- rm -rf "/$extDir" &
-  wait
-fi
+#if [[ "$dircheck" > "0" ]]; then
+#  echo 1
+#  kubectl exec "$umNode" -c columnstore-module-um -- rm -rf "/$ssbExtDir" &
+#  wait
+#fi
 
-kubectl exec "$umNode" -c columnstore-module-um  -- cp -a "$nfsMntPath" /
+kubectl exec "$umNode" -c columnstore-module-um  -- cp -a "$umNfsMntPath" /
 
 #3 Execute tests DDLs/create test schemas and tables
-kubectl exec -it "$umNode" -- mysql -vvv <  "$extDir/benchmark_scripts/create_table_mdb.sql"
+kubectl exec -it "$umNode" -- mysql -vvv <  "$ssbExtDir/benchmark_scripts/create_table_mdb.sql"
 
 #4 Import extract files in CS / load test tables with data
 

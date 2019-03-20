@@ -13,8 +13,9 @@ set -x
 umNode="$1-mdb-cs-um-module-0"
 
 #SSD path
-ssbDir="$2"
+ssbDir=`echo $2 | xargs`  
 
 #1 Execute power test script
 
+cd ssb-cs-tests/ 
 kubectl exec -it "$umNode" -- bash "$ssbDir/benchmark_scripts/stream_queries_mdb.sh" 

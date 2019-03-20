@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd ssb-cs-tests/
 set -e
 if [[ "$(docker images -q $1:$2 2> /dev/null)" == "" ]]; then
 	sed -e "s/\$(sf)/$3/g" build/Dockerfile.tempalte > Dockerfile

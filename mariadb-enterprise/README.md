@@ -381,7 +381,7 @@ This will build a docker image, push it into the remote Docker repo and create a
 
 ```$ kubectl logs <release-name>-infrastructure-test -f``` 
 
-### Running a Benchmark
+### Running a Master-Slave/Galera Benchmark
 
 The benchmark test runs a standard `sysbench` OLTP workload with 20 tables and 100,000 rows each that executes a mix of 90% reads (point, range, and aggregate SELECTs) to 10% writes (INSERTs, UPDATEs and DELETEs) in 16 concurrent threads. In order to run a benchmark, execute the following command:
 
@@ -390,6 +390,56 @@ The benchmark test runs a standard `sysbench` OLTP workload with 20 tables and 1
 This will build a docker image, push it into a remote repo and create a pod named `<release-name>-sysbench-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute sysbench. You can track the progress by running:
 
 ```$ kubectl logs <release-name>-sysbench-test -f```
+
+You can optionally specify the number of threads by adding `THREADS=<number of threads>` (by default `<number of threads>`=16) on the `make` command line.
+
+### Running a ColumnStore Benchmark(Star Schema Benchmark)
+
+The benchmark test runs a standard `start schema benchmark` OLTP workload with on a single DataMart containing 1 fact and 4 dimension tables tables
+Data Mart size is controlled via DATA_SCALE_FACTOR parameter.Table size = inital rows count * (SF). Inital fact size = 600000 rows,inital dimension size (1k:30k).
+
+#### Prepequisite - ColumnStore topology contating NFS mount 
+
+SAMPLE values.yaml file configuraion is available below:
+
+```yaml
+mariadb:
+  ...
+  # general cluster parameters
+  cluster:
+    id: null                                     # e.g. "1"
+    topology: columnstore                        # possible values 
+    ...
+
+  # server parameters
+  server:
+    ...
+    backup:
+      nfs:
+        server: 10.12.0.136                            # NFS server hostname or ip
+        path: /                                  # NFS path to mount
+      restoreFrom: null                          # name of restore
+```
+
+The following SSB tests are supported:
+
+- Load test
+- Power test
+- Throughput test
+
+In order to run a SSB benchmark test , execute one of the following commands:
+
+```$ make load-ssb-test MARIADB_CLUSTER=<release-name>``` 
+
+or
+
+```$ make power-ssb-test MARIADB_CLUSTER=<release-name>```
+
+or 
+
+```$ make throughput-ssb-test MARIADB_CLUSTER=<release-name>```
+
+Either of the above commands will build a docker image ,generate extaract set with in the immage, push it into a remote repo and create a pod named `<release-name>-sysbench-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute SSB test.
 
 You can optionally specify the number of threads by adding `THREADS=<number of threads>` (by default `<number of threads>`=16) on the `make` command line.
 
@@ -402,3 +452,10 @@ The following parameters can be used to alter the behaviors of `make`, by adding
 | DOCKER_REPO                                | gcr.io/dbaas-development | The remote Docker repo from which your Kubernetes cluster will pull images.                                         |
 | MARIADB_CLUSTER                            | sa-test                  | The name of an existing MariaDB cluster on Kubernetes to be tested or benchmarked                                  |
 | THREADS                                    | 16                       | Number of concurrent connections that will be used while running the benchmark.                                    |
+
+#### ColumnStore Benchmark specific parameters
+
+| Parameter                                  | Default                  | Description                                                                                                         |
+|--------------------------------------------|--------------------------|---------------------------------------------------------------------------------------------------------------------|
+| NFS_SERVER_IP                                | N/A | NFS server IP .NFS is used to move the data between SSB designated pod and CS UM pod                                         |
+| DATA_SCALE_FACTOR                           | 2                  | Scale factor resposible for defing the size of the ColumnStore that that is to be loaded.Table size = inital rows count * (SF). Inital fact size = 600000 rows.Inital dimension size between 1,000 and 30,000 rows.                                  |

@@ -28,7 +28,7 @@ spec:
   volumes:
   - name: nfs-volume
     nfs: 
-      server: 10.12.0.136
+      server: $(NFS_SERVER_IP)
       path: /
     capacity:
       storage: 1Mi

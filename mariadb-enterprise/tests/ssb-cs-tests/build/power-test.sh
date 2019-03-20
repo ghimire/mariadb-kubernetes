@@ -1,6 +1,6 @@
 #!/bin/bash
 #set -eu -o pipefail
-set -x
+#set -x
 ##################
 #Power Test
 #Restart the database system after load to avoid caching effects.
@@ -13,8 +13,8 @@ set -x
 umNode="$1-mdb-cs-um-module-0"
 
 #SSD path
-ssbDir="$2"
+ssbDir=`echo $2 | xargs`
 
 #1 Execute power test script
-
+cd ssb-cs-tests/
 kubectl exec -it "$umNode" -- mysql -vvv <  "$ssbDir/benchmark_scripts/queries_power_test_mdb.sql" 
