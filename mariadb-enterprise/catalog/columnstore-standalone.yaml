@@ -73,6 +73,7 @@ spec:
     spec:
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
+{{ tpl (.Files.Get "snippets/nfs-delay.yaml") . | indent 6 }}
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore
         image: {{ .Values.mariadb.columnstore.image }}
@@ -82,7 +83,7 @@ spec:
           - columnstore
         env:
           - name: BACKUP_RESTORE_FROM
-            value: {{ .Values.mariadb.server.backup.restoreFrom }}
+            value: {{ .Values.mariadb.server.restore.restoreFrom }}
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
         volumeMounts:
@@ -113,10 +114,8 @@ spec:
         - containerPort: 3306
 {{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
-        {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
           mountPath: /backup-storage
-        {{- end }}
         - name: mariadb-entrypoint-vol
           mountPath: /docker-entrypoint-initdb.d
         - name: mariadb-config-vol
@@ -124,27 +123,7 @@ spec:
  {{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
         - name: temp-data
           mountPath: /tmp/data
-      volumes:
-      {{- if .Values.mariadb.server.backup.nfs.server }}
-      - name: backup-data-storage
-        nfs:
-          server: {{ .Values.mariadb.server.backup.nfs.server }}
-          path: {{ .Values.mariadb.server.backup.nfs.path }}
-        capacity:
-          storage: 1Mi
-        accessModes:
-          - ReadWriteMany
-      {{- end }}
-      - name: mariadb-entrypoint-vol
-        emptyDir: {}
-      - name: mariadb-config-vol
-        emptyDir: {}
-      - name: mariadb-configtemplate-vol
-        configMap:
-          name: {{ .Release.Name }}-mariadb-config
-      - name: mariadb-secrets-vol
-        secret:
-          secretName: {{ .Release.Name }}-mariadb-secret
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
 

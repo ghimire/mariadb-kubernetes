@@ -106,7 +106,7 @@ spec:
           - columnstore
         env:
           - name: BACKUP_RESTORE_FROM
-            value: {{ .Values.mariadb.server.backup.restoreFrom }}
+            value: {{ .Values.mariadb.server.restore.restoreFrom }}
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
           - name: MARIADB_CS_NODE
@@ -143,10 +143,8 @@ spec:
         - containerPort: 3306
 {{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
-        {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
           mountPath: /backup-storage
-        {{- end }}
         - name: mariadb-entrypoint-vol
           mountPath: /docker-entrypoint-initdb.d
         - name: mariadb-config-vol
@@ -169,27 +167,7 @@ spec:
         #   initialDelaySeconds: 15
         #   periodSeconds: 2
         #   timeoutSeconds: 1
-      volumes:
-      {{- if .Values.mariadb.server.backup.nfs.server }}
-      - name: backup-data-storage
-        nfs:
-          server: {{ .Values.mariadb.server.backup.nfs.server }}
-          path: {{ .Values.mariadb.server.backup.nfs.path }}
-        capacity:
-          storage: 1Mi
-        accessModes:
-          - ReadWriteMany
-      {{- end }}
-      - name: mariadb-entrypoint-vol
-        emptyDir: {}
-      - name: mariadb-config-vol
-        emptyDir: {}
-      - name: mariadb-configtemplate-vol
-        configMap:
-          name: {{ .Release.Name }}-mariadb-config
-      - name: mariadb-secrets-vol
-        secret:
-          secretName: {{ .Release.Name }}-mariadb-secret
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
 
@@ -256,7 +234,7 @@ spec:
           - columnstore
         env:
           - name: BACKUP_RESTORE_FROM
-            value: {{ .Values.mariadb.server.backup.restoreFrom }}
+            value: {{ .Values.mariadb.server.restore.restoreFrom }}
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
           - name: MARIADB_CS_NODE
@@ -293,10 +271,8 @@ spec:
         - containerPort: 3306
 {{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
-        {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
           mountPath: /backup-storage
-        {{- end }}
         - name: mariadb-entrypoint-vol
           mountPath: /docker-entrypoint-initdb.d
         - name: mariadb-config-vol
@@ -329,27 +305,7 @@ spec:
           - mountPath: /mnt/config-template
             name: mariadb-configtemplate-vol
       restartPolicy: Always
-      volumes:
-      {{- if .Values.mariadb.server.backup.nfs.server }}
-      - name: backup-data-storage
-        nfs:
-          server: {{ .Values.mariadb.server.backup.nfs.server }}
-          path: {{ .Values.mariadb.server.backup.nfs.path }}
-        capacity:
-          storage: 1Mi
-        accessModes:
-          - ReadWriteMany
-      {{- end }}
-      - name: mariadb-entrypoint-vol
-        emptyDir: {}
-      - name: mariadb-config-vol
-        emptyDir: {}
-      - name: mariadb-configtemplate-vol
-        configMap:
-          name: {{ .Release.Name }}-mariadb-config
-      - name: mariadb-secrets-vol
-        secret:
-          secretName: {{ .Release.Name }}-mariadb-secret
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
   
