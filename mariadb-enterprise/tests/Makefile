@@ -1,4 +1,4 @@
-DOCKER_REPO  ?= gcr.io/dbaas-development
+DOCKER_REPO  ?= rowekamp
 MARIADB_CLUSTER ?= sa-test
 THREADS ?= 16
 IMAGE_NAME := mariadb-test

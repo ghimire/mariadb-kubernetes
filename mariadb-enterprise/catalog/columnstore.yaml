@@ -141,27 +141,7 @@ spec:
           value: PM
         ports:
         - containerPort: 3306
-        {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
-        resources:
-        {{- end }}
-          {{- if or (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
-          requests:
-          {{- end }}
-            {{- if .Values.mariadb.server.resources.requests.cpu }}
-            cpu: {{ .Values.mariadb.server.resources.requests.cpu }}
-            {{- end }}
-            {{- if .Values.mariadb.server.resources.requests.memory }}
-            memory: {{ .Values.mariadb.server.resources.requests.memory }}
-            {{- end }}
-          {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) }}
-          limits:
-          {{- end }}
-            {{- if .Values.mariadb.server.resources.limits.cpu }}
-            cpu: {{ .Values.mariadb.server.resources.limits.cpu }}
-            {{- end }}
-            {{- if .Values.mariadb.server.resources.limits.memory }}
-            memory: {{ .Values.mariadb.server.resources.limits.memory }}
-            {{- end }}
+{{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
         {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
@@ -211,24 +191,7 @@ spec:
         secret:
           secretName: {{ .Release.Name }}-mariadb-secret
 
-  # ensures persistent volumes end up on the same pod
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-      labels:
-        mariadb: {{ .Release.Name }}
-        storage.mariadb: {{ .Release.Name }}
-        {{- if .Values.mariadb.cluster.id }}
-        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-        {{- end }}
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: {{ .Values.mariadb.server.storage.size }}
-      {{- if .Values.mariadb.server.storage.class }}
-      storageClassName: {{ .Values.mariadb.server.storage.class }}
-      {{- end }}
+{{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
 
 ---
 
@@ -328,27 +291,7 @@ spec:
           value: UM
         ports:
         - containerPort: 3306
-        {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
-        resources:
-        {{- end }}
-          {{- if or (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
-          requests:
-          {{- end }}
-            {{- if .Values.mariadb.server.resources.requests.cpu }}
-            cpu: {{ .Values.mariadb.server.resources.requests.cpu }}
-            {{- end }}
-            {{- if .Values.mariadb.server.resources.requests.memory }}
-            memory: {{ .Values.mariadb.server.resources.requests.memory }}
-            {{- end }}
-          {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) }}
-          limits:
-          {{- end }}
-            {{- if .Values.mariadb.server.resources.limits.cpu }}
-            cpu: {{ .Values.mariadb.server.resources.limits.cpu }}
-            {{- end }}
-            {{- if .Values.mariadb.server.resources.limits.memory }}
-            memory: {{ .Values.mariadb.server.resources.limits.memory }}
-            {{- end }}
+{{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
         {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
@@ -408,24 +351,7 @@ spec:
         secret:
           secretName: {{ .Release.Name }}-mariadb-secret
 
-  # ensures persistent volumes end up on the same pod
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-      labels:
-        mariadb: {{ .Release.Name }}
-        storage.mariadb: {{ .Release.Name }}
-        {{- if .Values.mariadb.cluster.id }}
-        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-        {{- end }}
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: {{ .Values.mariadb.server.storage.size }}
-      {{- if .Values.mariadb.server.storage.class }}
-      storageClassName: {{ .Values.mariadb.server.storage.class }}
-      {{- end }}
+{{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
   
   # temporary storage for CS UM only
   - metadata:

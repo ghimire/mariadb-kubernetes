@@ -1,0 +1,25 @@
+volumes:
+- name: backup-data-storage
+  nfs:
+  {{- if eq .Values.mariadb.backup.target.type "auto" }}
+    server: {{ .Release.Name }}-mdb-1-nfs-0.{{ .Release.Name }}-mdb-nfs.{{ .Release.Namespace }}.svc.cluster.local
+  {{- else }}
+    server: {{ .Values.mariadb.backup.target.server }}
+  {{- end }}
+    path: {{ .Values.mariadb.backup.target.path }}
+  capacity:
+    storage: 1Mi
+  accessModes:
+    - ReadWriteMany
+- name: mariadb-entrypoint-vol
+  emptyDir: {}
+- name: mariadb-config-vol
+  emptyDir: {}
+- name: mariadb-configtemplate-vol
+  configMap:
+    name: {{ .Release.Name }}-mariadb-config
+- name: mariadb-secrets-vol
+  secret:
+    secretName: {{ .Release.Name }}-mariadb-secret
+- name: mariadb-socket-vol
+  emptyDir: {}

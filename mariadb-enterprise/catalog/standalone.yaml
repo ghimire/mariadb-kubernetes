@@ -4,30 +4,7 @@
 # replicas should always be 1.
 
 # External service
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-mariadb
-  labels:
-    mariadb: {{ .Release.Name }}
-    entrypoint.mariadb: {{ .Release.Name }}
-    {{- if .Values.mariadb.cluster.id }}
-    id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-    {{- end }}
-    {{- if .Values.mariadb.cluster.labels }}
-{{ toYaml .Values.mariadb.cluster.labels | indent 4 }}
-    {{- end }}
-    {{- if .Values.mariadb.server.labels }}
-{{ toYaml .Values.mariadb.server.labels | indent 4 }}
-    {{- end }}
-spec:
-  ports:
-  - name: mariadb
-    port: {{ .Values.mariadb.server.port }}
-    targetPort: {{ .Values.mariadb.server.port }}
-  clusterIP: None
-  selector:
-    server.mariadb: {{ .Release.Name }}
+{{ tpl (.Files.Get "snippets/external-service.yaml") . }}
 ---
 # a StatefulSet for the master/slave cluster
 apiVersion: apps/v1
@@ -35,37 +12,25 @@ kind: StatefulSet
 metadata:
   name: {{ .Release.Name }}-mdb-ms
   labels:
-    mariadb: {{ .Release.Name }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
     server.mariadb: {{ .Release.Name }}
-    {{- if .Values.mariadb.cluster.id }}
-    id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-    {{- end }}
 spec:
   selector:
     matchLabels:
       server.mariadb: {{ .Release.Name }}
-  serviceName: {{ .Release.Name }}-mariadb
+  serviceName: {{ .Release.Name }}-mdb-clust
   replicas: 1
   template:
     metadata:
       labels:
-        mariadb: {{ .Release.Name }}
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 8 }}
         server.mariadb: {{ .Release.Name }}
-        {{- if .Values.mariadb.cluster.id }}
-        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-        {{- end }}
-      {{- if or (.Values.mariadb.cluster.annotations) (.Values.mariadb.server.annotations) }}
-      annotations:
-      {{- end }}
-      {{- if .Values.mariadb.cluster.annotations }}
-{{ toYaml .Values.mariadb.cluster.annotations | indent 8 }}
-      {{- end }}
-      {{- if .Values.mariadb.server.annotations }}
-{{ toYaml .Values.mariadb.server.annotations | indent 8 }}
-      {{- end }}
+{{ tpl (.Files.Get "snippets/annotations.yaml") . | indent 6 }}
     spec:
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
+{{ tpl (.Files.Get "snippets/nfs-delay.yaml") . | indent 6 }}
+
       # simulate a state store client to bootstrap self as active master
       - name: init-get-master
         image: {{ .Values.mariadb.server.image }}
@@ -87,7 +52,7 @@ spec:
           - masterslave
         env:
         - name: RESTORE_FROM_FOLDER
-          value: {{ .Values.mariadb.server.backup.restoreFrom }}
+          value: {{ .Values.mariadb.server.restore.restoreFrom }}
         - name: CLUSTER_TOPOLOGY
           value: {{ .Values.mariadb.cluster.topology }}
         volumeMounts:
@@ -112,37 +77,15 @@ spec:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
           value: "Y"
         - name: RESTORE_FROM_FOLDER
-          value: {{ .Values.mariadb.server.backup.restoreFrom }}
+          value: {{ .Values.mariadb.server.restore.restoreFrom }}
         - name: CLUSTER_TOPOLOGY
           value: {{ .Values.mariadb.cluster.topology }}
         ports:
         - containerPort: {{ .Values.mariadb.server.port }}
-        {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
-        resources:
-        {{- end }}
-          {{- if or (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
-          requests:
-          {{- end }}
-            {{- if .Values.mariadb.server.resources.requests.cpu }}
-            cpu: {{ .Values.mariadb.server.resources.requests.cpu }}
-            {{- end }}
-            {{- if .Values.mariadb.server.resources.requests.memory }}
-            memory: {{ .Values.mariadb.server.resources.requests.memory }}
-            {{- end }}
-          {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) }}
-          limits:
-          {{- end }}
-            {{- if .Values.mariadb.server.resources.limits.cpu }}
-            cpu: {{ .Values.mariadb.server.resources.limits.cpu }}
-            {{- end }}
-            {{- if .Values.mariadb.server.resources.limits.memory }}
-            memory: {{ .Values.mariadb.server.resources.limits.memory }}
-            {{- end }}
+{{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}
         volumeMounts:
-        {{- if .Values.mariadb.server.backup.nfs.server }}
         - name: backup-data-storage
           mountPath: /backup-storage
-        {{- end }}
         - name: mariadb-entrypoint-vol
           mountPath: /docker-entrypoint-initdb.d
         - name: mariadb-config-vol
@@ -151,6 +94,8 @@ spec:
         - name: data
           mountPath: /var/lib/mysql
           subPath: mysql
+        - name: mariadb-socket-vol
+          mountPath: /var/run/mysqld
         livenessProbe:
           exec:
             command: ["mysqladmin", "ping", "--host=127.0.0.1", "--port=3307"]
@@ -165,45 +110,10 @@ spec:
           periodSeconds: 2
           timeoutSeconds: 1
 
+{{ tpl (.Files.Get "snippets/backup.yaml") . | indent 6 }}
+
       restartPolicy: Always
 
-      volumes:
-      {{- if .Values.mariadb.server.backup.nfs.server }}
-      - name: backup-data-storage
-        nfs:
-          server: {{ .Values.mariadb.server.backup.nfs.server }}
-          path: {{ .Values.mariadb.server.backup.nfs.path }}
-        capacity:
-          storage: 1Mi
-        accessModes:
-          - ReadWriteMany
-      {{- end }}
-      - name: mariadb-entrypoint-vol
-        emptyDir: {}
-      - name: mariadb-config-vol
-        emptyDir: {}
-      - name: mariadb-configtemplate-vol
-        configMap:
-          name: {{ .Release.Name }}-mariadb-config
-      - name: mariadb-secrets-vol
-        secret:
-          secretName: {{ .Release.Name }}-mariadb-secret
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 
-  # ensures persistent volumes end up on the same pod
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-      labels:
-        mariadb: {{ .Release.Name }}
-        storage.mariadb: {{ .Release.Name }}
-        {{- if .Values.mariadb.cluster.id }}
-        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
-        {{- end }}
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      resources:
-        requests:
-          storage: {{ .Values.mariadb.server.storage.size }}
-      {{- if .Values.mariadb.server.storage.class }}
-      storageClassName: {{ .Values.mariadb.server.storage.class }}
-      {{- end }}
+{{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}

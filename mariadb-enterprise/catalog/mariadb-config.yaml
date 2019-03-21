@@ -7,8 +7,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-mariadb-config
   labels:
-    mariadb: {{ .Release.Name }}
-    id.mariadb: "{{ .Values.mariadb.cluster.id }}"
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
 data:
   init-configurations.sh: |
 {{- if (eq .Values.mariadb.cluster.topology "columnstore") }}
@@ -66,6 +65,9 @@ data:
   backup-save.sh: |
 {{ tpl (.Files.Get "config/backup-save.sh") . | indent 4 }}
 
+  backup-job.sh: |
+{{ tpl (.Files.Get "config/backup-job.sh") . | indent 4 }}
+
 {{- if or (eq .Values.mariadb.cluster.topology "standalone") (eq .Values.mariadb.cluster.topology "masterslave") }}
   replication.sql: |
 {{ tpl (.Files.Get "config/replication.sql") . | indent 4 }}
@@ -74,7 +76,7 @@ data:
 {{ tpl (.Files.Get "config/galera.cnf") . | indent 4 }}
 {{- end }}
 
-{{- if .Values.mariadb.server.backup.restoreFrom }}
+{{- if .Values.mariadb.server.restore.restoreFrom }}
   backup-restore.sh: |
 {{ tpl (.Files.Get "config/backup-restore.sh") . | indent 4 }}
 {{- end }}

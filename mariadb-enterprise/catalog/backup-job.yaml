@@ -1,0 +1,45 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-mdb-backup-job
+  labels:
+{{ tpl (.Files.Get "snippets/labels.yaml") . | indent 4 }}
+    backup-job.mariadb: {{ .Release.Name }}
+{{ tpl (.Files.Get "snippets/annotations.yaml") . | indent 2}}
+spec:
+  schedule: "{{ .Values.mariadb.backup.schedule }}"
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 60
+      backoffLimit: 1
+
+      template:
+        spec:
+          containers:
+          - name: backup-job
+            image: ellerbrock/alpine-curl-ssl
+            command:
+            - sh
+            - /mnt/config-template/backup-job.sh
+            imagePullPolicy: Always
+            env:
+            - name: RELEASE_NAME
+              value: {{ .Release.Name }}
+            - name: CLUSTER_TOPOLOGY
+              value: {{ .Values.mariadb.cluster.topology }}
+            volumeMounts:
+            - name: mariadb-configtemplate-vol
+              mountPath: /mnt/config-template
+            - name: mariadb-secrets-vol
+              mountPath: "/etc/hmac-secret"
+              readOnly: true
+
+          restartPolicy: Never
+
+          volumes:
+          - name: mariadb-configtemplate-vol
+            configMap:
+              name: {{ .Release.Name }}-mariadb-config
+          - name: mariadb-secrets-vol
+            secret:
+              secretName: {{ .Release.Name }}-mariadb-secret

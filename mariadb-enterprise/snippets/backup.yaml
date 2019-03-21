@@ -1,0 +1,25 @@
+- name: backup
+  image: {{ .Values.mariadb.backup.image }}
+  command:
+    - flask
+    - run
+    - --host=0.0.0.0
+    - --port=80
+  imagePullPolicy: IfNotPresent
+  env:
+  - name: CLUSTER_TOPOLOGY
+    value: {{ .Values.mariadb.cluster.topology }}
+  - name: FLASK_APP
+    value: /python/backup/app.py
+  volumeMounts:
+  - name: backup-data-storage
+    mountPath: /backup-storage
+  # a permanent volume for data storage
+  - name: data
+    mountPath: /var/lib/mysql
+    subPath: mysql
+  - name: mariadb-socket-vol
+    mountPath: /var/run/mysqld
+  - name: mariadb-secrets-vol
+    mountPath: "/etc/hmac-secret"
+    readOnly: true
