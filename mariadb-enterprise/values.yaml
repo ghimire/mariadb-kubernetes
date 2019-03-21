@@ -44,7 +44,7 @@ mariadb:
       limits:
         cpu: null                                # e.g. "3000m"
         memory: null                             # e.g. "9G"
-    configuration:
+    configuration: null
     backup:
       nfs:
         server: null                             # NFS server hostname or ip
@@ -67,6 +67,7 @@ mariadb:
       limits:
         cpu: null     # e.g. "3000m"
         memory: null  # e.g. "9G"
+    configuration: null
 
 # statestore parameters
   statestore:

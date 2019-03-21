@@ -84,3 +84,12 @@ type=listener
 service=MaxInfo
 protocol=HTTPD
 port=8003
+
+{{- range $section, $content := .Values.mariadb.maxscale.configuration }}
+{{- if $content }}
+[{{ $section }}]
+{{- range $key, $value := $content }}
+{{ $key }}={{ $value }}
+{{- end }}
+{{- end -}}
+{{ end }}

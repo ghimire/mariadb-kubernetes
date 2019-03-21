@@ -2,7 +2,7 @@
 {{- if $content }}
 [{{ $section }}]
 {{- range $key, $value := $content }}
-{{ $key }} = {{ $value }}
+{{ $key }}={{ $value }}
 {{- end }}
 {{- end -}}
 {{ end }}
