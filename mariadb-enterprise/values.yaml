@@ -64,7 +64,7 @@ mariadb:
   columnstore:
     singlenodeCombined: false
     stableIpServices: false
-    image: nastybuff/cs:1.2.3
+    image: mariadb/columnstore:1.2.3
     numBlocksPct: 1024M
     totalUmMemory: 1G
     pm:
