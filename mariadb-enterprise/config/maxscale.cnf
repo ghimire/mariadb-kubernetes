@@ -1,5 +1,3 @@
-# Copyright (C) 2018, MariaDB Corporation
-#
 # Defines a starting configuration for MaxScale instances
 
 [maxscale]
