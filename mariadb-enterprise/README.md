@@ -207,16 +207,11 @@ The following list of parameters can be used with the helm chart by either modif
 | Parameter                                  | Default                  | Description                                                                                                         |
 |--------------------------------------------|--------------------------|---------------------------------------------------------------------------------------------------------------------|
 | _Global for the cluster_                                                                                                                                                                    |
-<<<<<<< HEAD
 | mariadb.cluster.id                         | null                     | A generated unique ID of the cluster (used as a label on all artefacts) for discovery in multi-tenant environments. |
 | Mariadb.cluster.topology                   | masterslave              | The type of cluster to create, one of: masterslave, galera, standalone, columnstore, columnstore-standalone         |
-=======
-| mariadb.cluster.id                         | null                     | A generated unique ID of the cluster (used as a label on all artifacts) for discovery in multi-tenant environments. |
-| Mariadb.cluster.topology                   | masterslave              | The type of cluster to create, one of: masterslave, galera, standalone, columnstore, columnstore-standalone  |
->>>>>>> dev/DBAAS-569
 | mariadb.cluster.labels                     | null                     | An associative array of custom labels in format name:value added to the cluster endpoint                            |
 | mariadb.cluster.annotations                | null                     | An associative array of custom annotations added to each pod in the topology                                        |
-| mariadb.cluster.nodeGroup                  | null                     | Label <value> to make sure cluster pods are only allocated to nodes with the label node.mariadb=<value>             |
+| mariadb.cluster.nodeGroup                  | null                     | Label \<value\> to make sure cluster pods are only allocated to nodes with the label node.mariadb=\<value\>             |
 | _Server instances_                         |                          |                                                                                                                     |
 | mariadb.server.users.admin.username        | admin                    | MariaDB admin user                                                                                                  |
 | mariadb.server.users.admin.password        | 5LVTpbGE2cGFtw69         | MariaDB admin password                                                                                              |
