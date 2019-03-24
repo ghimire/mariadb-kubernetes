@@ -1,5 +1,14 @@
 #!/bin/bash
-# Copyright (C) 2018, MariaDB Corporation
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2022-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 2 or later of the General
+# Public License.
 #
 # This script customizes templates based on the parameters passed to a command-line tool
 # the path to the target directory needs to be passed as first argument
