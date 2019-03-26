@@ -133,6 +133,16 @@ spec:
         command: ["/bin/sh"]
         args: ["-c", "cd /root; node ./client.js maxscale {{ .Release.Name }}-mdb-state"]
         imagePullPolicy: IfNotPresent
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-mariadb-secret
+                key: hmac-secret
         volumeMounts:
           - name: mariadb-configtemplate-vol
             mountPath: /mnt/config-template

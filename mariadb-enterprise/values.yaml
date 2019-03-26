@@ -19,6 +19,7 @@ mariadb:
     labels: null                                 # custom labels to be added to the mariadb service, e.g. for discovery   
     annotations: null                            # custom annotations to be added to each pod in the cluster
     nodeGroup: null                              # a node group X where any pod in the cluster may run, nodes must have the label node.mariadb=X
+    secret: m3fwCur1MvRAR8bjrsU1gUidiPQ0nzOB     # a cluster-wide secret for mutual HMAC authentication
 
   # server parameters
   server:
@@ -69,7 +70,7 @@ mariadb:
 
 # statestore parameters
   statestore:
-    image: mariadb/statestore:0.0.3
+    image: mariadb/statestore:0.0.4
 
 # columnstore cluster parameters
   columnstore:

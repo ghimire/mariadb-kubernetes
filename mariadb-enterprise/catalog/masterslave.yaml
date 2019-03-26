@@ -88,6 +88,16 @@ spec:
         command: ["/bin/sh"]
         args: ["-c", "cd /root; node ./client.js mariadb-init {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-mariadb-secret
+                key: hmac-secret
         volumeMounts:
           - name: mariadb-config-vol
             mountPath: /mnt/config-map
@@ -187,6 +197,16 @@ spec:
         command: ["/bin/sh"]
         args: ["-c", "cd /root; node ./client.js mariadb {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-mariadb-secret
+                key: hmac-secret
         volumeMounts:
           - name: mariadb-configtemplate-vol
             mountPath: /mnt/config-template
