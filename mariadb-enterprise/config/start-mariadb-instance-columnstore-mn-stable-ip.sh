@@ -198,5 +198,6 @@ if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then
         fi
     fi
 fi
+bash /mnt/config-map/sshd/run &
 echo "Defaulted to sleep something is wrong"
 sleep 3600

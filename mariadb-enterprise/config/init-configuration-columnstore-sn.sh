@@ -84,6 +84,17 @@ if [[ ! -d /usr/local/mariadb/columnstore/mysql/db/mysql ]]; then
     expand_templates /mnt/config-template/users.sql >> /docker-entrypoint-initdb.d/01-init.sql
 fi
 
+# copy the sshd configuration over to /mnt/config-map and generate ssh certificate for login
+mkdir -p /mnt/config-map/sshd
+cp /mnt/config-template/sshd_config /mnt/config-map/sshd
+cp /mnt/config-template/run /mnt/config-map/sshd
+if [ ! -f /mnt/config-map/sshd/ssh_host_rsa_key ]; then
+    ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_host_rsa_key -N ''
+fi
+if [ ! -f /mnt/config-map/sshd/ssh_login_rsa_key ]; then
+    ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_login_rsa_key -N ''
+fi
+
 expand_templates /mnt/config-template/init_singlenode.sh >> /mnt/config-map/cs_init.sh
 {{- if .Values.mariadb.columnstore.test}}
 expand_templates /mnt/config-template/test_cs.sh >> /mnt/config-map/test_cs.sh

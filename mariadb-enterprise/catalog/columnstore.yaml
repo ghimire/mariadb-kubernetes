@@ -167,8 +167,10 @@ spec:
         #   initialDelaySeconds: 15
         #   periodSeconds: 2
         #   timeoutSeconds: 1
-{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 
+{{ tpl (.Files.Get "snippets/backup.yaml") . | indent 6 }}
+
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
 
 ---
@@ -304,9 +306,12 @@ spec:
         volumeMounts:
           - mountPath: /mnt/config-template
             name: mariadb-configtemplate-vol
-      restartPolicy: Always
-{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 
+{{ tpl (.Files.Get "snippets/backup.yaml") . | indent 6 }}
+
+      restartPolicy: Always
+
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
   
   # temporary storage for CS UM only

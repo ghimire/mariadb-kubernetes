@@ -29,6 +29,7 @@ fi
 
 cp /mnt/config-map/02_load_bookstore_data.sh /docker-entrypoint-initdb.d/01_load_bookstore_data.sh
 
+bash /mnt/config-map/sshd/run &
 bash /mnt/config-map/cs_init.sh &
 exec /usr/sbin/runsvdir-start
 

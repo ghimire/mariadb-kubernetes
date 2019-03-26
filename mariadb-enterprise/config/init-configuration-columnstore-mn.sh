@@ -84,6 +84,17 @@ expand_templates /mnt/config-template/start-mariadb-instance.sh >> /mnt/config-m
 # expand_templates /mnt/config-template/liveness.sh >> /mnt/config-map/liveness.sh
 # expand_templates /mnt/config-template/readiness.sh >> /mnt/config-map/readiness.sh
 
+# copy the sshd configuration over to /mnt/config-map and generate ssh certificate for login
+mkdir -p /mnt/config-map/sshd
+cp /mnt/config-template/sshd_config /mnt/config-map/sshd
+cp /mnt/config-template/run /mnt/config-map/sshd
+if [ ! -f /mnt/config-map/sshd/ssh_host_rsa_key ]; then
+    ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_host_rsa_key -N ''
+fi
+if [ ! -f /mnt/config-map/sshd/ssh_login_rsa_key ]; then
+    ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_login_rsa_key -N ''
+fi
+
 if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then
     if [ ! -z $MARIADB_CS_DEBUG ]; then
         echo "Init Columnstore"

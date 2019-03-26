@@ -243,7 +243,7 @@ The following list of parameters can be used with the helm chart by either modif
 | *StateStore instances*                     |                          |                                                                                                                     |
 | mariadb.statestore.image                   | mariadb/statestore:0.0.3 | Name of Docker image for MariaDB StateStore                                                                         |
 | *Columnstore instances*                    |                          |                                                                                                                     |
-| mariadb.columnstore.image                  | nastybuff/cs:1.2.3       | Name of Docker image for MariaDB Columnstore                                                                         |
+| mariadb.columnstore.image                  | rowekamp/columnstore:1.2.3-651       | Name of Docker image for MariaDB Columnstore                                                                         |
 | mariadb.columnstore.numBlocksPct           | 1024М                    | Amount of physical memory to utilize for disk block caching                                                   |
 | mariadb.columnstore.totalUmMemory          | 1G                       | Amount of physical memory to utilize for joins, intermediate results and set operations on the UM         |
 | mariadb.columnstore.um.replicas            | 1                        | Number of Columnstore UM instances in columnstore topology                                                  |

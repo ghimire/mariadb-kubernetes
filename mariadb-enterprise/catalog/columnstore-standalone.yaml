@@ -123,8 +123,10 @@ spec:
  {{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 8 }}
         - name: temp-data
           mountPath: /tmp/data
-{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 
+{{ tpl (.Files.Get "snippets/backup.yaml") . | indent 6 }}
+
+{{ tpl (.Files.Get "snippets/volumes.yaml") . | indent 6 }}
 {{ tpl (.Files.Get "snippets/volumeClaimTemplates.yaml") . | indent 2 }}
 
   # temporary storage for CS UM only

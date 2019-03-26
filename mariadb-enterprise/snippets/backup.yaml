@@ -14,12 +14,18 @@
   volumeMounts:
   - name: backup-data-storage
     mountPath: /backup-storage
+  - name: mariadb-secrets-vol
+    mountPath: "/etc/hmac-secret"
+    readOnly: true
   # a permanent volume for data storage
+{{- if or (eq .Values.mariadb.cluster.topology "columnstore-standalone") (eq .Values.mariadb.cluster.topology "columnstore") }}
+  - name: mariadb-config-vol
+    mountPath: /mnt/config-map
+{{ tpl ( .Files.Get "snippets/columnstore-volumeMounts.yaml" ) . | indent 2 }}
+{{- else }}
   - name: data
     mountPath: /var/lib/mysql
     subPath: mysql
   - name: mariadb-socket-vol
     mountPath: /var/run/mysqld
-  - name: mariadb-secrets-vol
-    mountPath: "/etc/hmac-secret"
-    readOnly: true
+{{- end }}

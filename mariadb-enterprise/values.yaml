@@ -61,7 +61,7 @@ mariadb:
   columnstore:
     singlenodeCombined: false
     stableIpServices: false
-    image: nastybuff/cs:1.2.3
+    image: rowekamp/columnstore:1.2.3-651
     numBlocksPct: 1024M
     totalUmMemory: 1G
     pm:
@@ -92,7 +92,7 @@ mariadb:
 
   # backup parameters
   backup:
-    image: gcr.io/dbaas-development/mariadb-operator-python:0.0.5
+    image: gcr.io/dbaas-development/mariadb-operator:0.1.3.1
     schedule: null                            # crontab format like "* * * * *"
     secret: "random_string"
     target:
