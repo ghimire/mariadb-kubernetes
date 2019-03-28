@@ -35,6 +35,7 @@ UM_COUNT={{ .Values.mariadb.columnstore.um.replicas }}
 PM_COUNT={{ .Values.mariadb.columnstore.pm.replicas }}
 UM_HOST="$RELEASE_NAME-mdb-cs-um-module-"
 PM_HOST="$RELEASE_NAME-mdb-cs-pm-module-"
+bash /mnt/config-map/sshd/run &
 
 function ping_hosts() { 
     RET_CD=0
@@ -175,6 +176,5 @@ if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then
         fi
     fi
 fi
-bash /mnt/config-map/sshd/run &
 echo "Defaulted to sleep something is wrong"
 sleep 3600

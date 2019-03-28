@@ -90,9 +90,11 @@ cp /mnt/config-template/sshd_config /mnt/config-map/sshd
 cp /mnt/config-template/run /mnt/config-map/sshd
 if [ ! -f /mnt/config-map/sshd/ssh_host_rsa_key ]; then
     ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_host_rsa_key -N ''
+    chmod 600 ssh_host_rsa_key
 fi
 if [ ! -f /mnt/config-map/sshd/id_rsa ]; then
     ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/id_rsa -N ''
+    chmod 600 id_rsa
 fi
 
 expand_templates /mnt/config-template/init_singlenode.sh >> /mnt/config-map/cs_init.sh

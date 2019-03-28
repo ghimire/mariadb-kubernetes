@@ -92,7 +92,7 @@ mariadb:
 
   # backup parameters
   backup:
-    image: gcr.io/dbaas-development/mariadb-operator-651:0.1.3.1
+    image: gcr.io/dbaas-development/mariadb/operator-651:0.1.3.2
     schedule: null                            # crontab format like "* * * * *"
     secret: "random_string"
     target:

@@ -4,6 +4,8 @@ if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]] || [[ "$CLUSTER_TOPOLOGY" == "maste
     URL=$RELEASE_NAME-mdb-ms-0.$RELEASE_NAME-mdb-clust
 elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     URL=$RELEASE_NAME-mdb-galera-0.$RELEASE_NAME-mdb-clust
+elif [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]] || [[ "$CLUSTER_TOPOLOGY" == "columnstore-standalone" ]]; then
+    URL=$RELEASE_NAME-mdb-cs-pm-module-0.$RELEASE_NAME-mdb-clust
 fi
 
 BACKUP_DIR=backup-$RELEASE_NAME-`date +%Y%m%d-%H%M%S`

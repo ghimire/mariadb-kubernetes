@@ -26,6 +26,9 @@ spec:
   - name: mariadb
     port: {{ .Values.mariadb.server.port }}
     targetPort: {{ .Values.mariadb.server.port }}
+  - name: backup
+    port: 80
+    targetPort: 80
   clusterIP: None
   selector:
     um.mariadb: {{ .Release.Name }}

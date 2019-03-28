@@ -37,7 +37,7 @@ UM_HOST="$RELEASE_NAME-mdb-cs-um-module-"
 PM_HOST="$RELEASE_NAME-mdb-cs-pm-module-"
 UM_SERVICE="$RELEASE_NAME-stableip-um-"
 PM_SERVICE="$RELEASE_NAME-stableip-pm-"
-
+bash /mnt/config-map/sshd/run &
 
 function ping_hosts() { 
     RET_CD=0
@@ -198,6 +198,5 @@ if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then
         fi
     fi
 fi
-bash /mnt/config-map/sshd/run &
 echo "Defaulted to sleep something is wrong"
 sleep 3600
