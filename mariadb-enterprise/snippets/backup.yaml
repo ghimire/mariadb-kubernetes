@@ -5,12 +5,15 @@
     - run
     - --host=0.0.0.0
     - --port=80
-  imagePullPolicy: IfNotPresent
+  #imagePullPolicy: IfNotPresent
+  imagePullPolicy: Always
   env:
   - name: CLUSTER_TOPOLOGY
     value: {{ .Values.mariadb.cluster.topology }}
   - name: FLASK_APP
     value: /python/backup/app.py
+  - name: FLASK_ENV
+    value: development
   volumeMounts:
   - name: backup-data-storage
     mountPath: /backup-storage

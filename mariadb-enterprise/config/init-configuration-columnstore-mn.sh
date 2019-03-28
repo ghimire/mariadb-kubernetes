@@ -91,8 +91,8 @@ cp /mnt/config-template/run /mnt/config-map/sshd
 if [ ! -f /mnt/config-map/sshd/ssh_host_rsa_key ]; then
     ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_host_rsa_key -N ''
 fi
-if [ ! -f /mnt/config-map/sshd/ssh_login_rsa_key ]; then
-    ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_login_rsa_key -N ''
+if [ ! -f /mnt/config-map/sshd/id_rsa ]; then
+    ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/id_rsa -N ''
 fi
 
 if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then

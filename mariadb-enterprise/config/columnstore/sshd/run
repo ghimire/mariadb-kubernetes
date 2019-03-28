@@ -4,7 +4,7 @@
 cp /mnt/config-map/sshd/sshd_config /etc/ssh
 cp /mnt/config-map/sshd/ssh_host_rsa_key* /etc/ssh
 mkdir -p /root/.ssh
-cp /mnt/config-map/sshd/ssh_login_rsa_key.pub /root/.ssh/authorized_keys
+cp /mnt/config-map/sshd/id_rsa.pub /root/.ssh/authorized_keys
 
 # start the ssh daemon
 exec /usr/sbin/sshd -D > /dev/null
