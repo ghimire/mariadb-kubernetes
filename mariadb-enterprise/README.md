@@ -208,9 +208,10 @@ The following list of parameters can be used with the helm chart by either modif
 |--------------------------------------------|--------------------------|---------------------------------------------------------------------------------------------------------------------|
 | _Global for the cluster_                                                                                                                                                                    |
 | mariadb.cluster.id                         | null                     | A generated unique ID of the cluster (used as a label on all artefacts) for discovery in multi-tenant environments. |
-| Mariadb.cluster.topology                   | masterslave              | The type of cluster to create, one of: masterslave, galera, standalone                                       |
+| Mariadb.cluster.topology                   | masterslave              | The type of cluster to create, one of: masterslave, galera, standalone, columnstore, columnstore-standalone         |
 | mariadb.cluster.labels                     | null                     | An associative array of custom labels in format name:value added to the cluster endpoint                            |
 | mariadb.cluster.annotations                | null                     | An associative array of custom annotations added to each pod in the topology                                        |
+| mariadb.cluster.nodeGroup                  | null                     | Label <value> to make sure cluster pods are only allocated to nodes with the label node.mariadb=<value>             |
 | _Server instances_                         |                          |                                                                                                                     |
 | mariadb.server.users.admin.username        | admin                    | MariaDB admin user                                                                                                  |
 | mariadb.server.users.admin.password        | 5LVTpbGE2cGFtw69         | MariaDB admin password                                                                                              |
@@ -243,8 +244,24 @@ The following list of parameters can be used with the helm chart by either modif
 | mariadb.maxscale.resources.limits.memory   | null                     | The maximum share of memory for each MaxScale pod                                                                   |
 | *StateStore instances*                     |                          |                                                                                                                     |
 | mariadb.statestore.image                   | mariadb/statestore:0.0.3 | Name of Docker image for MariaDB StateStore                                                                         |
+| *Columnstore instances*                    |                          |                                                                                                                     |
+| mariadb.columnstore.image                  | mariadb/columnstore:1.2.3| Name of Docker image for MariaDB Columnstore                                                                         |
+| mariadb.columnstore.numBlocksPct           | 1024М                    | Amount of physical memory to utilize for disk block caching                                                   |
+| mariadb.columnstore.totalUmMemory          | 1G                       | Amount of physical memory to utilize for joins, intermediate results and set operations on the UM         |
+| mariadb.columnstore.um.replicas            | 1                        | Number of Columnstore UM instances in columnstore topology                                                  |
+| mariadb.columnstore.pm.replicas            | 3                        | Number of Columnstore PM instances in columnstore topology                                                  |
 
 Refer to https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container for the definition of resource requests and limits.
+
+## Supported topologies
+
+The following topologies are currently supported:
+
+* Standalone: a single MariaDB Server instance;
+* Master/Slave: 1 master MariaDB Server instance replicated to 2 slave MariaDB instances, fronted by 2 MaxScale instances in a load-balanced configuration. MaxScale provides automated failover for the master. The number of running MariaDB Server instances can be managed at runtime;
+* Galera: 3 MariaDB instances in a Master/Master replication configuration (Galera cluster), fronted by 2 MaxScale instances in a load-balanced configuration. The number of running MariaDB Server instances can be managed at runtime;
+* Columnstore-Standalone: a single MariaDB ColumnStore instance with 1 UM and 1 PM running on the same pod;
+* Columnstore: MariaDB ColumnStore with 1 UM and 3 PMs running on separate pods.
 
 ## Using the cluster
 
@@ -266,12 +283,12 @@ kubernetes      ClusterIP   10.152.183.1     <none>        443/TCP             4
 <release-name>-mdb-state   ClusterIP   10.152.183.129   <none>        80/TCP              28m
 ```
 
-Use the `ClusterIP` for `<release-name>-mariadb` as the host to connect to. The following ports are mapped to the local host in Master/Slave and Galera topologies:
+Use the `ClusterIP` for `<release-name>-mariadb` as the host to connect to. The following ports are mapped to the local host in `Master/Slave` and `Galera` topologies:
 
 - 4006: MaxScale ReadWrite Listener
 - 4008: MaxScale ReadOnly Listener
 
-and for standalone topologies:
+and for `Standalone`, `Columnstore` and `Columnstore-standalone` topologies:
 
 - 3306: MariaDB Server
 
@@ -283,11 +300,11 @@ kubectl exec -it <release-name>-mdb-ms-0 -- mysql -uadmin -p5LVTpbGE2cGFtw69 -P4
 kubectl exec -it <release-name>-mdb-ms-0 -- mysql -uadmin -p5LVTpbGE2cGFtw69 -P4008 -h <ClusterIP>
 ```
 
-Applications deployed in the same namespace in Kubernetes can also access the cluster using the hostname `<release-name>-mariadb`.
+Applications deployed in the same namespace in Kubernetes can also access the cluster using the hostname `<release-name>-mariadb`. This is the only connectivity option available for a headless service.
 
 ## Using the Backup/Restore functionality
 
-You can backup an already running cluster or initialize a new cluster with an existing backup
+You can backup an already running cluster or initialize a new cluster with an existing backup. Only the Master/Slave, Galera, and Standalone topologies are currently supported.
 
 ### Backup
 
@@ -328,3 +345,63 @@ You can use an existing backup and load it when starting a new cluster. Restorin
     ```sh
     helm install . --name <release-name> --set mariadb.server.backup.restoreFrom=<backup_path> --set mariadb.server.backup.nfs.server=<nfs_server_ip> --set mariadb.server.backup.nfs.path=<nfs_mount_point>
     ```
+
+## Running Sanity Test, infrastructure tests and Benchmark tests
+
+The `tests` folder contains support for running sanity-level deployment tests, based on the mysql-test framework (https://mariadb.com/kb/en/library/mysqltest/), and benchmarking, based on sysbench (https://github.com/akopytov/sysbench/tree/1.0), against an existing MariaDB cluster in Kubernetes. It also includes a framework for infrastructure tests to simulate infrastructure failures like node outages. Tests can be run using the Unix `make` command.
+
+### Pre-requisites
+
+In order to be able to execute the `make` command for running a test or a benchmark, the following tools must be installed:
+
+* make
+* docker (v17+)
+* kubernetes client (v1.9+), configured to access the Kubernetes cluster where MariaDB will runs as cluster admin
+
+Note: before running `make`, ensure that a MariaDB cluster must be created and is in an operational state.
+
+Note: Sanity tests and benchmarks should only be run against clusters that have at least 5GB of storage available (option `--set mariadb.server.storage.size=5Gi` on the `helm install` command line).
+
+Note: Infrastructure tests require to be executed in the `testing` namespace with a k8s service account `tester` bound to the (RBAC) role of `admin` in the regarding namespace.
+
+### Running a Sanity Test
+
+The sanity test loads a simulated Bookstore database (refer to https://github.com/mariadb-corporation/mariadb-server-docker/blob/master/tx_sandbox/labs.md for details) and runs a number of pre-defined aggregation queries to verify that results are as expected. In order to run a sanity-level deployment test, execute the following command:
+
+```$ make test MARIADB_CLUSTER=<release-name>```
+
+This will build a docker image, push it into the remote Docker repo and create a pod named `<release-name>-sanity-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute the test framwork. You can track the progress of the test run by running:
+
+```$ kubectl logs <release-name>-sanity-test -f``` 
+
+### Running the Infrastructure Test
+
+The infrastructure test executes the tests deposited in `infrastructure/global` for every deployed cluster, and specific tests for MariaDB Server and MariaDB ColumnStore clusters respectively from `infrastructure/server` or `infrastructure/columnstore`. Details about those tests can be found in the README.md of these directories. The infrastructure test requires the cluster to test to be started in the `testing` namespace. In order to execute the infrastructure test, execute the following command:
+
+```$ make infrastructure-test MARIADB_CLUSTER=<release-name>```
+
+This will build a docker image, push it into the remote Docker repo and create a pod named `<release-name>-infrastructure-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute the test framwork. You can track the progress of the test run by running:
+
+```$ kubectl logs <release-name>-infrastructure-test -f``` 
+
+### Running a Benchmark
+
+The benchmark test runs a standard `sysbench` OLTP workload with 20 tables and 100,000 rows each that executes a mix of 90% reads (point, range, and aggregate SELECTs) to 10% writes (INSERTs, UPDATEs and DELETEs) in 16 concurrent threads. In order to run a benchmark, execute the following command:
+
+```$ make benchmark MARIADB_CLUSTER=<release-name>```
+
+This will build a docker image, push it into a remote repo and create a pod named `<release-name>-sysbench-test` that will connect to an existing MariaDB cluster named `<release-name>` and will execute sysbench. You can track the progress by running:
+
+```$ kubectl logs <release-name>-sysbench-test -f```
+
+You can optionally specify the number of threads by adding `THREADS=<number of threads>` (by default `<number of threads>`=16) on the `make` command line.
+
+### Parameters
+
+The following parameters can be used to alter the behaviors of `make`, by adding them to the command line in the format `<parameter>=<value>`:
+
+| Parameter                                  | Default                  | Description                                                                                                         |
+|--------------------------------------------|--------------------------|---------------------------------------------------------------------------------------------------------------------|
+| DOCKER_REPO                                | gcr.io/dbaas-development | The remote Docker repo from which your Kubernetes cluster will pull images.                                         |
+| MARIADB_CLUSTER                            | sa-test                  | The name of an existing MariaDB cluster on Kubernetes to be tested or benchmarked                                  |
+| THREADS                                    | 16                       | Number of concurrent connections that will be used while running the benchmark.                                    |

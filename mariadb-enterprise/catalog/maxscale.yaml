@@ -1,4 +1,13 @@
-# Copyright (C) 2018, MariaDB Corporation
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2022-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 2 or later of the General
+# Public License.
 #
 # Defines a HA maxscale cluster as a deployment fronted
 # by a load-balancer service that is also the client endpoint.
@@ -24,6 +33,7 @@ spec:
   - name: maxscale-readonly
     port: {{ .Values.mariadb.maxscale.ports.readonly }}
     targetPort: {{ .Values.mariadb.maxscale.ports.readonly }}
+  clusterIP: None
   selector:
     maxscale.mariadb: {{ .Release.Name }}
 ---
@@ -63,6 +73,7 @@ spec:
 {{ toYaml .Values.mariadb.maxscale.annotations | indent 8 }}
       {{- end }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       - name: init-maxscale
         image: {{ .Values.mariadb.server.image }}

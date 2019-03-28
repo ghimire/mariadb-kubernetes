@@ -1,4 +1,13 @@
-# Copyright (C) 2018, MariaDB Corporation
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2022-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 2 or later of the General
+# Public License.
 #
 # Defines a state store server that maintains (through heartbeat calls
 # from each pod in a MariaDB cluster on a regular scheduled interval):
@@ -20,6 +29,7 @@ metadata:
     id.mariadb: "{{ .Values.mariadb.cluster.id }}"
     {{ end }}
 spec:
+  clusterIP: None
   selector:
     state-store.mariadb: {{ .Release.Name }}
   ports:
@@ -47,6 +57,7 @@ spec:
         mariadb: {{ .Release.Name }}
         state-store.mariadb: {{ .Release.Name }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       containers:
       - name: state-store
         image: {{ .Values.mariadb.statestore.image }}

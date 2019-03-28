@@ -1,5 +1,14 @@
 #!/usr/bin/bash
-# Copyright (C) 2018, MariaDB Corporation
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2022-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 2 or later of the General
+# Public License.
 #
 # Starts and initializes a MariaDB master or slave instance
 set -ex
@@ -17,7 +26,7 @@ fi
 
 if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]] || [[ "$CLUSTER_TOPOLOGY" == "masterslave" ]]; then
     # fire up the instance
-    /usr/local/bin/docker-entrypoint.sh mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync
+    /usr/local/bin/docker-entrypoint.sh mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
 elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     MASTER_HOST=$(cat /mnt/config-map/master)
 
@@ -25,8 +34,8 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
 
     # fire up the instance
     if [[ "$MASTER_HOST" == "localhost" ]]; then
-        /usr/local/bin/docker-entrypoint.sh mysqld  --wsrep-new-cluster --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync
+        /usr/local/bin/docker-entrypoint.sh mysqld  --wsrep-new-cluster --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1 --wsrep-node-address=${DWAPI_PODIP}
     else
-        /usr/local/bin/docker-entrypoint.sh mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync
+        /usr/local/bin/docker-entrypoint.sh mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1 --wsrep-node-address=${DWAPI_PODIP}
     fi
 fi

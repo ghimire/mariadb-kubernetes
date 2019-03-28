@@ -1,4 +1,13 @@
-# Copyright (C) 2018, MariaDB Corporation
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2022-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 2 or later of the General
+# Public License.
 #
 # Defines a standalone configuration in a StatefulSet behind. The number of
 # replicas should always be 1.
@@ -64,6 +73,7 @@ spec:
 {{ toYaml .Values.mariadb.server.annotations | indent 8 }}
       {{- end }}
     spec:
+{{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       # simulate a state store client to bootstrap self as active master
       - name: init-get-master
@@ -152,14 +162,14 @@ spec:
           subPath: mysql
         livenessProbe:
           exec:
-            command: ["mysqladmin", "ping"]
+            command: ["mysqladmin", "ping", "--host=127.0.0.1", "--port=3307"]
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
         readinessProbe:
           exec:
             # Check we can execute queries over TCP (skip-networking is off).
-            command: ["mysql", "-h", "127.0.0.1", "-e", "SELECT 1"]
+            command: ["mysql", "-h", "127.0.0.1", "--port", "3307", "-e", "SELECT 1"]
           initialDelaySeconds: 5
           periodSeconds: 2
           timeoutSeconds: 1

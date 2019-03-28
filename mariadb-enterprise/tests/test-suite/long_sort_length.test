@@ -1,0 +1,1 @@
+SET @@max_length_for_sort_data = 5001;SELECT p.p FROM (SELECT bookname,category, sum(cover_price) p FROM Books GROUP BY bookname,category) p ORDER BY bookname,category LIMIT 1;

@@ -1,0 +1,1 @@
+SELECT DISTINCT COUNT(customer_id) FROM Transactions;

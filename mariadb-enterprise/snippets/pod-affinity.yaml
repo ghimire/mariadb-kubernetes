@@ -1,0 +1,34 @@
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2022-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 2 or later of the General
+# Public License.
+
+# define pod anti-affinities to put best effort in ensuring that no two components of a database cluster run on the same node
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 10
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: mariadb
+            operator: In
+            values:
+            - {{ .Release.Name }}
+        topologyKey: kubernetes.io/hostname
+{{- if .Values.mariadb.cluster.nodeGroup }}
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node.mariadb
+          operator: In
+          values:
+          - {{ .Values.mariadb.cluster.nodeGroup }}
+{{- end }}
