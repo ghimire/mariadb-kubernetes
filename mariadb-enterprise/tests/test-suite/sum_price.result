@@ -1,0 +1,3 @@
+SELECT sum(price) FROM Transactions;
+sum(price)
+115003016.41

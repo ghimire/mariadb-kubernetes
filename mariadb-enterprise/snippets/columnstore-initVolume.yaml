@@ -1,0 +1,20 @@
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2023-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 3 or later of the General
+# Public License.
+
+- name: init-volume
+  image: {{ .Values.mariadb.columnstore.image }}
+  command:
+    - bash
+    - "-c"
+    - "set -e; if [ ! -d \"/mnt/columnstore/etc\" ]; then rm -rf /mnt/columnstore/data && cp -rp /usr/local/mariadb/columnstore/data /mnt/columnstore/ && rm -rf /mnt/columnstore/local && cp -rp /usr/local/mariadb/columnstore/local /mnt/columnstore/ && rm -rf /mnt/columnstore/mysql && mkdir -p /mnt/columnstore/mysql && chown mysql:mysql /mnt/columnstore/mysql && cp -rp /usr/local/mariadb/columnstore/mysql/db /mnt/columnstore/mysql/ &&cp -rp /usr/local/mariadb/columnstore/etc /mnt/columnstore/; fi"
+  volumeMounts:
+    - name: data
+      mountPath: /mnt/columnstore

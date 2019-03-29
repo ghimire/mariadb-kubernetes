@@ -1,0 +1,3 @@
+SELECT DISTINCT COUNT(customer_id) FROM Transactions;
+COUNT(customer_id)
+11279171

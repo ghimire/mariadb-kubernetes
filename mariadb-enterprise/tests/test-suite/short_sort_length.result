@@ -1,0 +1,3 @@
+SET @@max_length_for_sort_data = 501;
+SELECT p.p FROM (SELECT bookname,category, sum(cover_price) p FROM Books GROUP BY bookname,category) p ORDER BY category LIMIT 1;
+ERROR HY000: Internal error: IDB-2015: Sorting length exceeded. Session variable max_length_for_sort_data needs to be set higher.

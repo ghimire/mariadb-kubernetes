@@ -1,10 +1,24 @@
+# Copyright (c) 2018-2019 MariaDB Corporation Ab
+# 
+# Use of this software is governed by the Business Source License included
+# in the LICENSE.TXT file and at www.mariadb.com/bsl11.
+#
+# Change Date: 2023-04-01
+# 
+# On the date above, in accordance with the Business Source License, use
+# of this software will be governed by version 3 or later of the General
+# Public License.
+
 mariadb:
+  debug: true
+
   # general cluster parameters
   cluster:
     id: null                                     # e.g. "1"
-    topology: masterslave                        # possible values "masterslave", "standalone", "galera"
+    topology: masterslave                        # possible values "masterslave", "standalone", "galera", "columnstore", "columnstore-standalone" 
     labels: null                                 # custom labels to be added to the mariadb service, e.g. for discovery   
     annotations: null                            # custom annotations to be added to each pod in the cluster
+    nodeGroup: null                              # a node group X where any pod in the cluster may run, nodes must have the label node.mariadb=X
 
   # server parameters
   server:
@@ -56,3 +70,36 @@ mariadb:
 # statestore parameters
   statestore:
     image: mariadb/statestore:0.0.3
+
+# columnstore cluster parameters
+  columnstore:
+    singlenodeCombined: false
+    stableIpServices: false
+    image: mariadb/columnstore:1.2.3
+    numBlocksPct: 1024M
+    totalUmMemory: 1G
+    pm:
+      replicas: 3
+      # We want to handle configurations of UM and PM separately
+      # resources:
+      #   requests:
+      #     cpu: null                                # e.g. "1000m"
+      #     memory: null                             # e.g. "3G"
+      #   limits:
+      #     cpu: null                                # e.g. "3000m"
+      #     memory: null
+    um:
+      replicas: 1
+      # We want to handle configurations of UM and PM separately 
+      # resources:
+      #   requests:
+      #     cpu: null                                # e.g. "1000m"
+      #     memory: null                             # e.g. "3G"
+      #   limits:
+      #     cpu: null                                # e.g. "3000m"
+      #     memory: null
+      
+    #The following parameters will be removed from the final setup
+    test: false
+    sandbox: false
+    retries: 60 # 60x5=300sec - up to 5min 
