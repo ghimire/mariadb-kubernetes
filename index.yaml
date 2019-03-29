@@ -3,12 +3,12 @@ entries:
   mariadb-enterprise:
   - apiVersion: v1
     appVersion: 0.1.3
-    created: 2019-03-28T09:45:31.549893188+02:00
+    created: 2019-03-29T08:07:03.839946247+02:00
     description: A helm chart for deploying MariaDB on Kubernetes that supports multiple
       enterprise topologies
-    digest: fdc8c4c06a31f7abd2d703cc7bf7cc0072bda57ba14719ca58da4225adaeea1e
+    digest: d0f0775d36431598dfbd48b7060ed90a118e6f4771c4d0276d3a24dc40de930e
     name: mariadb-enterprise
     urls:
     - https://raw.githubusercontent.com/mariadb-corporation/mariadb-kubernetes/master/mariadb-enterprise-0.1.3.tgz
     version: 0.1.3
-generated: 2019-03-28T09:45:31.548276825+02:00
+generated: 2019-03-29T08:07:03.837434817+02:00

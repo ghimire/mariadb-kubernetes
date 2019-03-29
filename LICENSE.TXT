@@ -10,9 +10,9 @@ Additional Use Grant: You may use the Licensed Work when your application
                       uses the Licensed Work with a total of less than three
                       server or container or Pod instances for any purpose.
 
-Change Date:          2022-04-01
+Change Date:          2023-04-01
 
-Change License:       Version 2 or later of the GNU General Public License as
+Change License:       Version 3 or later of the GNU General Public License as
                       published by the Free Software Foundation.
 
 For information about alternative licensing arrangements for the Software,
