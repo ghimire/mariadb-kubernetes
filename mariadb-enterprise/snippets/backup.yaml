@@ -12,8 +12,6 @@
     value: {{ .Values.mariadb.cluster.topology }}
   - name: FLASK_APP
     value: /python/backup/app.py
-  - name: FLASK_ENV
-    value: development
   volumeMounts:
   - name: backup-data-storage
     mountPath: /backup-storage
