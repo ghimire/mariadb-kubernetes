@@ -85,11 +85,13 @@ spec:
           - /mnt/config-template/init-configurations.sh
           - columnstore
         env:
-          - name: BACKUP_RESTORE_FROM
-            value: {{ .Values.mariadb.server.restore.restoreFrom }}
+          - name: RESTORE_FROM_FOLDER
+            value: {{ .Values.mariadb.columnstore.restore.restoreFrom }}
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
         volumeMounts:
+          - name: backup-data-storage
+            mountPath: /backup-storage
           - mountPath: /mnt/secrets
             name: mariadb-secrets-vol
             readOnly: true
@@ -113,6 +115,8 @@ spec:
           value: "Y"
         - name: CLUSTER_TOPOLOGY
           value: {{ .Values.mariadb.cluster.topology }}
+        - name: RESTORE_FROM_FOLDER
+          value: {{ .Values.mariadb.columnstore.restore.restoreFrom }}
         ports:
         - containerPort: 3306
 {{ tpl (.Files.Get "snippets/resources.yaml") . | indent 8 }}

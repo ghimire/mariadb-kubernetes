@@ -90,11 +90,21 @@ cp /mnt/config-template/sshd_config /mnt/config-map/sshd
 cp /mnt/config-template/run /mnt/config-map/sshd
 if [ ! -f /mnt/config-map/sshd/ssh_host_rsa_key ]; then
     ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/ssh_host_rsa_key -N ''
-    chmod 600 ssh_host_rsa_key
+    chmod 600 /mnt/config-map/sshd/ssh_host_rsa_key
 fi
 if [ ! -f /mnt/config-map/sshd/id_rsa ]; then
     ssh-keygen -t rsa -b 4096 -f /mnt/config-map/sshd/id_rsa -N ''
-    chmod 600 id_rsa
+    chmod 600 /mnt/config-map/sshd/id_rsa
+fi
+
+# restore the node
+if [[ ! "$RESTORE_FROM_FOLDER" == "" ]]; then
+    echo "restoring node from backup folder $RESTORE_FROM_FOLDER"
+    bash /mnt/config-template/backup-restore.sh
+    if [ $? -ne 0 ]; then
+        echo "error: wasn't able to restore the backup from $RESTORE_FROM_FOLDER"
+        exit 1
+    fi
 fi
 
 if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then

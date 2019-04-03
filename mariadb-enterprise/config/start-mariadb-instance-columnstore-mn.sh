@@ -115,28 +115,17 @@ function get_IP_from_ping() {
 [[ $(hostname) =~ -([0-9]+)$ ]] || exit 1
 server_id=${BASH_REMATCH[1]}
 
-# load backup
-if [[ ! "$BACKUP_RESTORE_FROM" == "" ]]; then
-    if [[ "$MASTER_HOST" == "localhost" ]]; then
-        chown -R mysql:mysql /backup-storage/$RESTORE_FROM_FOLDER
-    fi
-fi
-
-
 if [[ "$MARIADB_CS_NODE" == "UM" && -f "/mnt/config-map/master" ]]; then
     export MARIADB_CS_MASTER="$(cat /mnt/config-map/master)"
 fi
 
-#what else can it be in this file
+# what else can it be in this file
 if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then
     if [ ! -z $MARIADB_CS_DEBUG ]; then
         echo "StartColumnstore"
         echo "$MARIADB_CS_NODE:$MY_IP"
         echo "Master:$MARIADB_CS_MASTER"
         echo "IP:$MY_IP"
-    fi
-    if [[ "$MARIADB_CS_NODE" == "UM" && -f "/mnt/config-map/master" ]]; then
-        export MARIADB_CS_MASTER="$(cat /mnt/config-map/master)"
     fi
 
     if [[ "$MARIADB_CS_NODE" == "UM" ]]; then
@@ -153,27 +142,22 @@ if [[ "$CLUSTER_TOPOLOGY" == "columnstore" ]]; then
             exec /usr/sbin/runsvdir-start
         fi
     elif [[ "$MARIADB_CS_NODE" == "PM" ]]; then
-        #if [[ "$CONT_INDEX" -eq $(( PM_COUNT-1 )) ]]; then
         if [[ "$CONT_INDEX" -eq 0 ]]; then
             #First PM
             echo "Frst PM"
             echo "Starting postConfiguration"
-            fi
             wait_ping_hosts
             MARIADB_CS_POSTCFG_INPUT=$(build_post_config_input)
             if [ ! -z $MARIADB_CS_DEBUG ]; then
                 echo $PING_DEBUG
                 echo $MARIADB_CS_POSTCFG_INPUT
             fi
-            sh /mnt/config-map/cs_init.sh 2>&1 &
-            exec /usr/sbin/runsvdir-start
         else
             #Any other PM
             echo "PM node"
-            fi
-            sh /mnt/config-map/cs_init.sh 2>&1 &
-            exec /usr/sbin/runsvdir-start
         fi
+        sh /mnt/config-map/cs_init.sh 2>&1 &
+        exec /usr/sbin/runsvdir-start
     fi
 fi
 echo "Defaulted to sleep something is wrong"

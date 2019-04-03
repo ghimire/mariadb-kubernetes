@@ -13,6 +13,8 @@ MCSDIR=/usr/local/mariadb/columnstore
 export MCSDIR
 # file used to track / record initialization and prevent subsequent rerun
 FLAG="$MCSDIR/etc/container-initialized"
+# file used to track / record backup and prevent subsequent rerun
+RESTORE_FLAG="$MCSDIR/etc/backup-restored"
 
 function run_tests(){
         if [  -f "/mnt/config-map/test_cs.sh" ]; then
@@ -59,6 +61,11 @@ while ! [ -e $FLAG ]; do
 done
 echo $ATTEMPT
 
+# Change into read-write mode after backup and set restored flag
+if [[ ! "$RESTORE_FROM_FOLDER" == "" ]] && [ ! -e $RESTORE_FLAG ]; then
+    /usr/local/mariadb/columnstore/bin/mcsadmin resumedatabasewrites y
+    touch $RESTORE_FLAG
+fi
 
 print_info
 run_tests

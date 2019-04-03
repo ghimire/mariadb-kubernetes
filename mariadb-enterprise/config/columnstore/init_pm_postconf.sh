@@ -18,6 +18,8 @@ set -x
 MCSDIR=/usr/local/mariadb/columnstore
 # file used to track / record initialization and prevent subsequent rerun
 FLAG="$MCSDIR/etc/container-initialized"
+# file used to track / record backup and prevent subsequent rerun
+RESTORE_FLAG="$MCSDIR/etc/backup-restored"
 # directory which can contain sql, sql.gz, and sh scripts that will be run
 # after successful initialization.
 INITDIR=/docker-entrypoint-initdb.d
@@ -59,6 +61,13 @@ fi
 # hack to specify user env var as this is sometimes relied on to detect
 # root vs non root install
 export USER=root
+
+# Change into read-write mode after backup and set restored flag
+if [[ ! "$RESTORE_FROM_FOLDER" == "" ]] && [ ! -e $RESTORE_FLAG ]; then
+    # TODO wait for the system to be active
+    /usr/local/mariadb/columnstore/bin/mcsadmin resumedatabasewrites y
+    touch $RESTORE_FLAG
+fi
 
 # Initialize CS only once.
 if [ -e $FLAG ]; then

@@ -80,6 +80,10 @@ data:
   backup-restore.sh: |
 {{ tpl (.Files.Get "config/backup-restore.sh") . | indent 4 }}
 {{- end }}
+{{- if .Values.mariadb.columnstore.restore.restoreFrom }}
+  backup-restore.sh: |
+{{ tpl (.Files.Get "config/columnstore/backup-restore.sh") . | indent 4 }}
+{{- end }}
 
 {{- if or (eq .Values.mariadb.cluster.topology "columnstore-standalone") (eq .Values.mariadb.cluster.topology "columnstore") }}
   sshd_config: |

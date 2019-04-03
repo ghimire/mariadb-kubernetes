@@ -14,6 +14,8 @@ MARIADB_CS_DEBUG="<<MARIADB_CS_DEBUG>>"
 MCSDIR=/usr/local/mariadb/columnstore
 # file used to track / record initialization and prevent subsequent rerun
 FLAG="$MCSDIR/etc/container-initialized"
+# file used to track / record backup and prevent subsequent rerun
+RESTORE_FLAG="$MCSDIR/etc/backup-restored"
 # directory which can contain sql, sql.gz, and sh scripts that will be run
 # after successful initialization.
 INITDIR=/docker-entrypoint-initdb.d
@@ -55,6 +57,11 @@ chmod a+x /usr/local/mariadb/columnstore/bin/rsync.sh
 # hack to specify user env var as this is sometimes relied on to detect
 # root vs non root install
 export USER=root
+
+# Change set restored flag on first run
+if [[ ! "$RESTORE_FROM_FOLDER" == "" ]] && [ ! -e $RESTORE_FLAG ]; then
+    touch $RESTORE_FLAG
+fi
 
 # Initialize CS only once.
 if [ -e $FLAG ]; then

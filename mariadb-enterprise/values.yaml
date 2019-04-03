@@ -89,6 +89,8 @@ mariadb:
     test: false
     sandbox: false
     retries: 60 # 60x5=300sec - up to 5min
+    restore:
+      restoreFrom: null                          # name of restore subdirectory
 
   # backup parameters
   backup:
