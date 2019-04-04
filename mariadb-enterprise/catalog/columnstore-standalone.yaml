@@ -90,6 +90,8 @@ spec:
           - name: CLUSTER_TOPOLOGY
             value: {{ .Values.mariadb.cluster.topology }}
         volumeMounts:
+          - name: data
+            mountPath: /mnt/columnstore
           - name: backup-data-storage
             mountPath: /backup-storage
           - mountPath: /mnt/secrets

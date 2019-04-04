@@ -39,6 +39,23 @@ function print_info(){
         $MCSDIR/bin/mcsadmin getSystemMemory
 }
 
+# wait for mcsadmin getSystemStatus to show active / active write suspended
+wait_for_columnstore_active()
+{
+    ATTEMPT=1
+    MAX_TRIES=32
+    STATUS=$($MCSDIR/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+    echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): getSystemStatus: $STATUS"
+    echo "$STATUS" | grep -q 'System.*ACTIVE'
+    while [ 0 -ne $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
+        sleep 5
+        ATTEMPT=$(($ATTEMPT+1))
+        STATUS=$($MCSDIR/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+        echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): getSystemStatus: $STATUS"
+        echo "$STATUS" | grep -q 'System.*ACTIVE'
+    done
+}
+
 if [ ! -z $MARIADB_CS_DEBUG ]; then
     #set +x
     echo '------------------------------'
@@ -63,6 +80,7 @@ echo $ATTEMPT
 
 # Change into read-write mode after backup and set restored flag
 if [[ ! "$RESTORE_FROM_FOLDER" == "" ]] && [ ! -e $RESTORE_FLAG ]; then
+    wait_for_columnstore_active
     /usr/local/mariadb/columnstore/bin/mcsadmin resumedatabasewrites y
     touch $RESTORE_FLAG
 fi

@@ -248,6 +248,7 @@ The following list of parameters can be used with the helm chart by either modif
 | mariadb.columnstore.totalUmMemory          | 1G                       | Amount of physical memory to utilize for joins, intermediate results and set operations on the UM         |
 | mariadb.columnstore.um.replicas            | 1                        | Number of Columnstore UM instances in columnstore topology                                                  |
 | mariadb.columnstore.pm.replicas            | 3                        | Number of Columnstore PM instances in columnstore topology                                                  |
+| mariadb.columnstore.restore.restoreFrom    | null                     | Subdirectory to use to restore the database on initial startup                                                      |
 | mariadb.backup.target.type           | auto                     | Backup type (`auto` or `nfs`)                                                                                              |
 | mariadb.backup.target.server           | null                     | Backup NFS server host (only if type is `nfs`)                                                                                              |
 | mariadb.backup.target.path             | /                        | Backup NFS server path to mount (only if type is `nfs`)                                                                                     |
@@ -336,7 +337,8 @@ You can use an existing backup and load it when starting a new cluster. Restorin
 #### Restore procedure
 
 1. Change these values in the values.yaml file:
-    - `mariadb.server.restore.restoreFrom` should point to the exact directory containing the backup.
+    - `mariadb.server.restore.restoreFrom` should point to the exact directory containing the backup in case you want to restore a MariaDB Server cluster.
+    - `mariadb.columnstore.restore.restoreFrom` should point to the exact directory containing the backup in case you want to restore a MariaDB ColumnStore cluster.
     - `mariadb.backup.target.server` should be the IP of hostname of the NFS server
     - `mariadb.backup.target.path` should be the NFS mount point (optional, default is `"/"`)
 2. Start the cluster as you would normally using
