@@ -37,6 +37,23 @@ wait_for_procmon()
     done
 }
 
+# wait for mcsadmin getSystemStatus to show active / active write suspended
+wait_for_columnstore_active()
+{
+    ATTEMPT=1
+    MAX_TRIES=32
+    STATUS=$($MCSDIR/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+    echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): getSystemStatus: $STATUS"
+    echo "$STATUS" | grep -q 'System.*ACTIVE'
+    while [ 0 -ne $? ] && [ $ATTEMPT -le $MAX_TRIES ]; do
+        sleep 5
+        ATTEMPT=$(($ATTEMPT+1))
+        STATUS=$($MCSDIR/bin/mcsadmin getSystemStatus | tail -n +9 | grep System | grep -v "System and Module statuses")
+        echo "wait_for_columnstore_active($ATTEMPT/$MAX_TRIES): getSystemStatus: $STATUS"
+        echo "$STATUS" | grep -q 'System.*ACTIVE'
+    done
+}
+
 # hack to ensure server-id is set to unique value per vm because my.cnf is
 # not in a good location for a volume
 SERVER_ID=$(hostname -i | cut -d "." -f 4)
@@ -64,8 +81,8 @@ export USER=root
 
 # Change into read-write mode after backup and set restored flag
 if [[ ! "$RESTORE_FROM_FOLDER" == "" ]] && [ ! -e $RESTORE_FLAG ]; then
-    # TODO wait for the system to be active
-    /usr/local/mariadb/columnstore/bin/mcsadmin resumedatabasewrites y
+    wait_for_columnstore_active
+    $MCSDIR/bin/mcsadmin resumedatabasewrites y
     touch $RESTORE_FLAG
 fi
 
