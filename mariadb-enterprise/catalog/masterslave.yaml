@@ -64,21 +64,13 @@ spec:
   replicas: {{ .Values.mariadb.server.replicas }}
   template:
     metadata:
-      {{- if or (.Values.mariadb.cluster.annotations) (.Values.mariadb.server.annotations) }}
-      annotations:
-      {{- end }}
-      {{- if .Values.mariadb.cluster.annotations }}
-{{ toYaml .Values.mariadb.cluster.annotations | indent 8 }}
-      {{- end }}
-      {{- if .Values.mariadb.server.annotations }}
-{{ toYaml .Values.mariadb.server.annotations | indent 8 }}
-      {{- end }}
       labels:
         mariadb: {{ .Release.Name }}
         server.mariadb: {{ .Release.Name }}
         {{- if .Values.mariadb.cluster.id }}
         id.mariadb: "{{ .Values.mariadb.cluster.id }}"
         {{- end }}
+{{ tpl (.Files.Get "snippets/annotations-pod.yaml") . | indent 6 }}
     spec:
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
@@ -190,6 +182,7 @@ spec:
         volumeMounts:
           - name: mariadb-configtemplate-vol
             mountPath: /mnt/config-template
+{{ tpl (.Files.Get "snippets/monitoring-server.yaml") . | indent 6 }}
 
       restartPolicy: Always
 

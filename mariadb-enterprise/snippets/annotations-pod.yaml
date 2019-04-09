@@ -1,0 +1,13 @@
+{{- if or (.Values.mariadb.cluster.annotations) (.Values.mariadb.server.annotations) (eq .Values.mariadb.cluster.monitoring.mode "global") }}
+annotations:
+{{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9104"
+{{- end }}
+{{- if .Values.mariadb.cluster.annotations }}
+{{ toYaml .Values.mariadb.cluster.annotations | indent 2 }}
+{{- end }}
+{{- if .Values.mariadb.server.annotations }}
+{{ toYaml .Values.mariadb.server.annotations | indent 2 }}
+{{- end }}
+{{- end }}

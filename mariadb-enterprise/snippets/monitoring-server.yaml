@@ -1,0 +1,11 @@
+{{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+- name: metrics
+  image: {{ .Values.mariadb.server.monitoring.image }}
+  imagePullPolicy: "IfNotPresent"
+  env:
+  - name: DATA_SOURCE_NAME
+    value: "root:@(127.0.0.1:3306)/"
+  ports:
+  - name: metrics
+    containerPort: 9104
+{{- end }}
