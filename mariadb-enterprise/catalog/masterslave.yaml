@@ -180,6 +180,10 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 2
           timeoutSeconds: 1
+        lifecycle:
+          preStop:
+            exec:
+              command: ["mysqladmin","shutdown"]
 
       # runs a state store client to ensure the state is being maitained
       - name: state
