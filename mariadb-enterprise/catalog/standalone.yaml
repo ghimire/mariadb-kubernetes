@@ -109,6 +109,9 @@ spec:
             mountPath: /mnt/config-template
           - name: mariadb-config-vol
             mountPath: /mnt/config-map
+          - name: data
+            mountPath: /var/lib/mysql
+            subPath: mysql
 
       containers:
       - name: mariadb-server
