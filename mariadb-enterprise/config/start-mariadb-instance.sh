@@ -51,6 +51,11 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
 
         $ENTRYPOINT mysqld --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     else
+        # prevent initialization, it is going to sync anyway
+        if [ ! -d /var/lib/mysql/mysql ]; then
+            mkdir -p /var/lib/mysql/mysql
+        fi
+        
         $ENTRYPOINT mysqld --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     fi
 fi
