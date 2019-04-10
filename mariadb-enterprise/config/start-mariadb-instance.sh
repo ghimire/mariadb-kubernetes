@@ -38,13 +38,17 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
 
     if [ -d /etc/my.cnf.d ]; then
         ln -s /usr/lib64/galera/libgalera_smm.so /usr/lib/libgalera_smm.so
-        cp /mnt/config-map/galera.cnf /etc/my.cnf.d/galera.cnf
-    else
-        cp /mnt/config-map/galera.cnf /etc/mysql/mariadb.conf.d/galera.cnf
     fi
+
+    cp /mnt/config-map/galera.cnf /etc/mysql/mariadb.conf.d/galera.cnf
 
     # fire up the instance
     if [[ "$MASTER_HOST" == "localhost" ]]; then
+        # clean old galera state
+        if [[ -f /var/lib/mysql/grastate.dat ]]; then
+            rm -rf /var/lib/mysql/grastate.dat
+        fi
+
         $ENTRYPOINT mysqld --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     else
         $ENTRYPOINT mysqld --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
