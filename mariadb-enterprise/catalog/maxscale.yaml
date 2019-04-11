@@ -124,6 +124,12 @@ spec:
             {{- if .Values.mariadb.maxscale.resources.limits.memory }}
             memory: {{ .Values.mariadb.maxscale.resources.limits.memory }}
             {{- end }}
+
+        lifecycle:
+          preStop:
+            exec:
+              command: ["maxctrl","stop", "maxscale"]
+
         volumeMounts:
         - name: mariadb-config-vol
           mountPath: /etc/maxscale-cfg
