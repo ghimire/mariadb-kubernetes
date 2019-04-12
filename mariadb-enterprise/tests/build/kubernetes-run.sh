@@ -31,7 +31,7 @@ fi
 # create new resource
 set -e
 if [[ "$3" == "sysbench" ]]; then
-    sed -e "s/\$(MARIADB_CLUSTER)/$1/g" -e "s/\$(IMAGE)/${img}/g" -e "s/\$(SYSBENCH_THREADS)/$4/g" build/sysbench-job.yaml | kubectl create -f -
+    sed -e "s/\$(MARIADB_CLUSTER)/$1/g" -e "s/\$(IMAGE)/${img}/g" -e "s/\$(SYSBENCH_THREADS)/$4/g" -e "s/\$(SYSBENCH_NUMBER_OF_TABLES)/$5/g" -e "s/\$(SYSBENCH_TABLE_SIZE)/$6/g" -e "s/\$(SYSBENCH_TIME)/$7/g" -e "s/\$(SYSBENCH_DELETE_INSERTS)/$8/g" build/sysbench-job.yaml | kubectl create -f -
 elif [[ "$3" == "infrastructure" ]]; then
     sed -e "s/\$(MARIADB_CLUSTER)/$1/g" -e "s/\$(IMAGE)/${img}/g" build/infrastructure-job.yaml | kubectl create -f -
 else

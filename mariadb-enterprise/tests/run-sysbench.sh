@@ -41,8 +41,8 @@ sysbench \
 	--mysql-user=${MARIADB_USER} \
 	--mysql-password=${MARIADB_PASSWORD} \
 	--mysql-port=${MARIADB_PORT} \
-	--tables=20 \
-	--table-size=100000 \
+	--tables=${SYSBENCH_NUMBER_OF_TABLES} \
+	--table-size=${SYSBENCH_TABLE_SIZE} \
 	prepare
 
 # give slaves a chance to catch up
@@ -55,14 +55,14 @@ sysbench \
 	/usr/share/sysbench/oltp_read_write.lua \
 	--threads=${SYSBENCH_THREADS} \
 	--events=0 \
-	--time=60 \
+	--time=${SYSBENCH_TIME} \
 	--mysql-host=${MARIADB_HOST} \
 	--mysql-user=${MARIADB_USER} \
-       	--mysql-password=${MARIADB_PASSWORD} \
+    --mysql-password=${MARIADB_PASSWORD} \
 	--mysql-port=${MARIADB_PORT} \
-	--tables=20 \
-	--delete_inserts=10 \
-	--table-size=100000 \
+	--tables=${SYSBENCH_NUMBER_OF_TABLES} \
+	--delete_inserts=${SYSBENCH_DELETE_INSERTS} \
+	--table-size=${SYSBENCH_TABLE_SIZE} \
 	--db-ps-mode=disable \
 	--report-interval=1 \
 	--histogram \
@@ -73,7 +73,6 @@ sysbench \
 	--distinct_ranges=2 \
 	--index_updates=0 \
 	--non_index_updates=1 \
-	--delete_inserts=1 \
 	--skip_trx=true \
 	--mysql-ignore-errors=1062 \
 	run

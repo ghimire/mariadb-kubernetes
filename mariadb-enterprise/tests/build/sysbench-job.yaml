@@ -24,3 +24,11 @@ spec:
       value: $(MARIADB_CLUSTER)-mariadb
     - name: SYSBENCH_THREADS
       value: "$(SYSBENCH_THREADS)"
+    - name: SYSBENCH_NUMBER_OF_TABLES
+      value: "$(SYSBENCH_NUMBER_OF_TABLES)"
+    - name: SYSBENCH_TABLE_SIZE
+      value: "$(SYSBENCH_TABLE_SIZE)"
+    - name: SYSBENCH_TIME
+      value: "$(SYSBENCH_TIME)"
+    - name: SYSBENCH_DELETE_INSERTS
+      value: "$(SYSBENCH_DELETE_INSERTS)"
