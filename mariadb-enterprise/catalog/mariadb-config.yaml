@@ -87,3 +87,7 @@ data:
   backup-restore.sh: |
 {{ tpl (.Files.Get "config/backup-restore.sh") . | indent 4 }}
 {{- end }}
+{{- if .Values.mariadb.server.configuration }}
+  mariadb.cnf: |
+{{ tpl (.Files.Get "config/mariadb.cnf") . | indent 4 }}
+{{- end }}

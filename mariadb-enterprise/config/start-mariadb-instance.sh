@@ -30,6 +30,10 @@ else
    ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
 fi
 
+if [ -f /mnt/config-map/maraidb.cnf ]; then
+    cp /mnt/config-map/maraidb.cnf /etc/mysql/mariadb.conf.d/maraidb.cnf
+fi
+
 if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]] || [[ "$CLUSTER_TOPOLOGY" == "masterslave" ]]; then
     # fire up the instance
     $ENTRYPOINT mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1

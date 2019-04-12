@@ -1,0 +1,8 @@
+{{- range $section, $content := .Values.mariadb.server.configuration }}
+{{- if $content }}
+[{{ $section }}]
+{{- range $key, $value := $content }}
+{{ $key }}={{ $value }}
+{{- end }}
+{{- end -}}
+{{ end }}

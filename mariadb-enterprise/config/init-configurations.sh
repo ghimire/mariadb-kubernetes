@@ -60,6 +60,10 @@ else
             cp /mnt/config-template/backup-restore.sh /docker-entrypoint-initdb.d/
         fi
 
+        if [ -f /mnt/config-template/mariadb.cnf ]; then
+            expand_templates /mnt/config-template/mariadb.cnf > /mnt/config-map/maraidb.cnf
+        fi
+
         if [[ "$MASTER_HOST" == "localhost" ]]; then
             # this is the master and it's the first run, ensure maxscale user is initialized
             expand_templates /mnt/config-template/users.sql > /docker-entrypoint-initdb.d/init.sql
