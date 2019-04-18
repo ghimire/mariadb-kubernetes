@@ -74,5 +74,5 @@ sysbench \
 	--index_updates=0 \
 	--non_index_updates=1 \
 	--skip_trx=true \
-	--mysql-ignore-errors=1062 \
+	--mysql-ignore-errors=1062,1213 \
 	run
