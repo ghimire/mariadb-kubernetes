@@ -58,9 +58,13 @@ spec:
         state-store.mariadb: {{ .Release.Name }}
     spec:
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
+      {{ if .Values.mariadb.cluster.imagePullSecret -}}
+      imagePullSecrets:
+      - name: {{ .Values.mariadb.cluster.imagePullSecret }} 
+      {{- end }}
       containers:
       - name: state-store
-        image: {{ .Values.mariadb.statestore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{- .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
         args: ["-c", "cd /root; node ./server.js"]
         imagePullPolicy: IfNotPresent

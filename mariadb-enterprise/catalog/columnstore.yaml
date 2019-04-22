@@ -104,11 +104,15 @@ spec:
         id.mariadb: {{ .Values.mariadb.cluster.id }}
         {{- end }}
     spec:
+      {{ if .Values.mariadb.cluster.imagePullSecret -}}
+      imagePullSecrets:
+      - name: {{ .Values.mariadb.cluster.imagePullSecret }} 
+      {{- end }}
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore-pm
-        image: {{ .Values.mariadb.columnstore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -134,7 +138,7 @@ spec:
       containers:
 #Columnstore Module
       - name: columnstore-module-pm
-        image: {{ .Values.mariadb.columnstore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         # start a mariadb instance
         command:
         - bash
@@ -280,11 +284,15 @@ spec:
         id.mariadb: {{ .Values.mariadb.cluster.id }}
         {{- end }}
     spec:
+      {{ if .Values.mariadb.cluster.imagePullSecret -}}
+      imagePullSecrets:
+      - name: {{ .Values.mariadb.cluster.imagePullSecret }} 
+      {{- end }}
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       ## runs a state store client to determine the IP of the active master
       - name: init-get-um-master
-        image: {{ .Values.mariadb.statestore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
         args: ["-c", "cd /root; node ./client.js mariadb-init {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent
@@ -295,7 +303,7 @@ spec:
             name: mariadb-configtemplate-vol
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore-um
-        image: {{ .Values.mariadb.columnstore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -321,7 +329,7 @@ spec:
       containers:
 #Columnstore Module
       - name: columnstore-module-um
-        image: {{ .Values.mariadb.columnstore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         # start a mariadb instance
         command:
         - bash
@@ -387,7 +395,7 @@ spec:
 
       # runs a state store client to ensure the state is being maitained
       - name: state-client
-        image: {{ .Values.mariadb.statestore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
         args: ["-c", "cd /root; node ./client.js mariadb {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent

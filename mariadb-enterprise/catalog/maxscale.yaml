@@ -73,10 +73,14 @@ spec:
 {{ toYaml .Values.mariadb.maxscale.annotations | indent 8 }}
       {{- end }}
     spec:
+      {{ if .Values.mariadb.cluster.imagePullSecret -}}
+      imagePullSecrets:
+      - name: {{ .Values.mariadb.cluster.imagePullSecret }} 
+      {{- end }}
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       - name: init-maxscale
-        image: {{ .Values.mariadb.server.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -92,7 +96,7 @@ spec:
 
       containers:
       - name: maxscale
-        image: {{ .Values.mariadb.maxscale.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.maxscale.image }}
         args:
         - maxscale
         - -d
@@ -129,7 +133,7 @@ spec:
           mountPath: /etc/maxscale-cfg
 
       - name: state
-        image: {{ .Values.mariadb.statestore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
         args: ["-c", "cd /root; node ./client.js maxscale {{ .Release.Name }}-mdb-state"]
         imagePullPolicy: IfNotPresent
