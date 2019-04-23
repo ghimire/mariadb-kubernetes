@@ -71,7 +71,7 @@ mariadb:
 
 # statestore parameters
   statestore:
-    image: mariadb/statestore:0.0.3
+    image: mariadb/statestore:0.0.3-2
 
 # columnstore cluster parameters
   columnstore:

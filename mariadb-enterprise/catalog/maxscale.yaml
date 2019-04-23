@@ -135,7 +135,7 @@ spec:
       - name: state
         image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
-        args: ["-c", "cd /root; node ./client.js maxscale {{ .Release.Name }}-mdb-state"]
+        args: ["-c", "node ./client.js maxscale {{ .Release.Name }}-mdb-state"]
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: mariadb-configtemplate-vol
