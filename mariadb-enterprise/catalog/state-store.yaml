@@ -66,7 +66,7 @@ spec:
       - name: state-store
         image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{- .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
-        args: ["-c", "cd /root; node ./server.js"]
+        args: ["-c", "node ./server.js"]
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

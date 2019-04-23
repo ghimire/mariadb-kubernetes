@@ -90,7 +90,7 @@ spec:
       - name: init-get-master
         image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
-        args: ["-c", "cd /root; node ./client.js mariadb-init {{ .Release.Name }}-mdb-state /mnt/config-map"]
+        args: ["-c", "node ./client.js mariadb-init {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: mariadb-config-vol
@@ -189,7 +189,7 @@ spec:
       - name: state
         image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
-        args: ["-c", "cd /root; node ./client.js mariadb {{ .Release.Name }}-mdb-state /mnt/config-map"]
+        args: ["-c", "node ./client.js mariadb {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: mariadb-configtemplate-vol
