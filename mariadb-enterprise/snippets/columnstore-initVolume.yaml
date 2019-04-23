@@ -10,7 +10,7 @@
 # Public License.
 
 - name: init-volume
-  image: {{ .Values.mariadb.columnstore.image }}
+  image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
   command:
     - bash
     - "-c"

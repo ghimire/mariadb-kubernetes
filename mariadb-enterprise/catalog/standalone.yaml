@@ -73,11 +73,15 @@ spec:
 {{ toYaml .Values.mariadb.server.annotations | indent 8 }}
       {{- end }}
     spec:
+      {{ if .Values.mariadb.cluster.imagePullSecret -}}
+      imagePullSecrets:
+      - name: {{ .Values.mariadb.cluster.imagePullSecret }} 
+      {{- end }}
 {{ tpl ( .Files.Get "snippets/pod-affinity.yaml" ) . | indent 6 }}
       initContainers:
       # simulate a state store client to bootstrap self as active master
       - name: init-get-master
-        image: {{ .Values.mariadb.server.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
         command: ["/bin/sh"]
         args: ["-c", "echo 'localhost' > /mnt/config-map/master"]
         imagePullPolicy: IfNotPresent
@@ -89,7 +93,7 @@ spec:
 
       # runs an initialization script to prepare the correct startup configuration
       - name: init-masterslave
-        image: {{ .Values.mariadb.server.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -112,7 +116,7 @@ spec:
 
       containers:
       - name: mariadb-server
-        image: {{ .Values.mariadb.server.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
         command:
         # start a mariadb instance
         - bash

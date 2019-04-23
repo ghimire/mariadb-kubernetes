@@ -84,7 +84,7 @@ spec:
       initContainers:
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore
-        image: {{ .Values.mariadb.columnstore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -108,7 +108,7 @@ spec:
       containers:
 #Columnstore Module
       - name: columnstore-module-pm
-        image: {{ .Values.mariadb.columnstore.image }}
+        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         # start a mariadb instance
         command:
         - bash
