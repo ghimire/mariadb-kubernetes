@@ -21,7 +21,7 @@ server_id=${BASH_REMATCH[1]}
 if [[ ! "$RESTORE_FROM_FOLDER" == "" ]]; then
     mkdir /backup_local
     cp -a /backup-storage/$RESTORE_FROM_FOLDER/* /backup_local
-    chown -R mysql:mysql /backup_local
+    # chown -R mysql:mysql /backup_local
 fi
 
 if [ -f /usr/local/bin/entrypoint.sh ]; then
@@ -30,15 +30,13 @@ else
    ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
 fi
 
+export USER=mysql
+
 if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]] || [[ "$CLUSTER_TOPOLOGY" == "masterslave" ]]; then
     # fire up the instance
-    $ENTRYPOINT mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
+    $ENTRYPOINT --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
 elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     MASTER_HOST=$(cat /mnt/config-map/master)
-
-    if [ -d /etc/my.cnf.d ]; then
-        ln -s /usr/lib64/galera/libgalera_smm.so /usr/lib/libgalera_smm.so
-    fi
 
     cp /mnt/config-map/galera.cnf /etc/mysql/mariadb.conf.d/galera.cnf
 
@@ -49,13 +47,14 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
             rm -rf /var/lib/mysql/grastate.dat
         fi
 
-        $ENTRYPOINT mysqld --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
+        $ENTRYPOINT --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     else
         # prevent initialization, it is going to sync anyway
+        export SKIP_INITIALIZATION=1
         if [ ! -d /var/lib/mysql/mysql ]; then
             mkdir -p /var/lib/mysql/mysql
         fi
-        
-        $ENTRYPOINT mysqld --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
+
+        $ENTRYPOINT --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     fi
 fi

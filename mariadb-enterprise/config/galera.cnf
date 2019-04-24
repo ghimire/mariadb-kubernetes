@@ -8,7 +8,7 @@ innodb_buffer_pool_size=122M
 innodb_doublewrite=1
 wsrep_debug=ON
 wsrep_on=ON
-wsrep_provider=/usr/lib/libgalera_smm.so
+wsrep_provider=<<LIBGALERA>>
 wsrep_provider_options="gcache.size=300M; gcache.page_size=300M"
 wsrep_cluster_name="<<RELEASE_NAME>>-<<CLUSTER_ID>>-cluster"
 wsrep_cluster_address="gcomm://<<CLUSTER_ADDRESS>>"
