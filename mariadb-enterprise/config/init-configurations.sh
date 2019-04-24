@@ -21,18 +21,12 @@ function expand_templates() {
         -e "s/<<REPLICATION_PASSWORD>>/${REPL_PWD}/g" \
         -e "s/<<RELEASE_NAME>>/${RELEASE_NAME}/g" \
         -e "s/<<CLUSTER_ID>>/${CLUSTER_ID}/g" \
-        -e "s=<<LIBGALERA>>=${LIBGALERA}=g" \
         $1
 }
 
 set -ex
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ -d /etc/my.cnf.d ]; then
-    LIBGALERA="/usr/lib64/galera/libgalera_smm.so"
-else
-    LIBGALERA="/usr/lib/libgalera_smm.so"
-fi
 
 # APPLICATION=$(hostname -f | cut -d '.' -f 2 | cut -d '-' -f 1)
 # ENVIRONMENT=$(hostname -f | cut -d '.' -f 2 | cut -d '-' -f 2)
@@ -58,6 +52,11 @@ else
             sed -r -i "s/<<CLUSTER_ADDRESS>>/$(hostname -i)/" /mnt/config-map/galera.cnf
         else
             sed -r -i "s/<<CLUSTER_ADDRESS>>/$MASTER_HOST/" /mnt/config-map/galera.cnf
+        fi
+        if [ -d /etc/my.cnf.d ]; then
+            sed -r -i "s=<<LIBGALERA>>=/usr/lib64/galera/libgalera_smm.so=" /mnt/config-map/galera.cnf
+        else
+            sed -r -i "s=<<LIBGALERA>>=/usr/lib/libgalera_smm.so=" /mnt/config-map/galera.cnf
         fi
     fi
 
