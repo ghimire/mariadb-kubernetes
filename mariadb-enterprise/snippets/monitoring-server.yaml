@@ -1,11 +1,22 @@
 {{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
 - name: metrics
-  image: {{ .Values.mariadb.server.monitoring.image }}
+  image: {{ .Values.mariadb.server.monitoring.metricsMonitoring.image }}
   imagePullPolicy: "IfNotPresent"
   env:
   - name: DATA_SOURCE_NAME
     value: "root:@(127.0.0.1:3306)/"
   ports:
   - name: metrics
+    containerPort: 9104
+{{- end }}
+{{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+- name: logs
+  image: {{ .Values.mariadb.server.monitoring.logsMonitoring.image }}
+  imagePullPolicy: "IfNotPresent"
+  env:
+  - name: MARIADB_INSTANCE_NAME
+    value: "grafana"
+  ports:
+  - name: logs
     containerPort: 9104
 {{- end }}

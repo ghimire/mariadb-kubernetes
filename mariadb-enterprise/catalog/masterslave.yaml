@@ -159,6 +159,8 @@ spec:
         - name: data
           mountPath: /var/lib/mysql
           subPath: mysql
+        - name: logs
+          mountPath: /var/log/mysql
         livenessProbe:
           exec:
             command: ["mysqladmin", "ping", "--host=127.0.0.1", "--port=3307"]
@@ -212,6 +214,22 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
+      labels:
+        mariadb: {{ .Release.Name }}
+        storage.mariadb: {{ .Release.Name }}
+        {{- if .Values.mariadb.cluster.id }}
+        id.mariadb: "{{ .Values.mariadb.cluster.id }}"
+        {{- end }}
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: {{ .Values.mariadb.server.storage.size }}
+      {{- if .Values.mariadb.server.storage.class }}
+      storageClassName: {{ .Values.mariadb.server.storage.class }}
+      {{- end }}
+  - metadata:
+      name: logs
       labels:
         mariadb: {{ .Release.Name }}
         storage.mariadb: {{ .Release.Name }}
