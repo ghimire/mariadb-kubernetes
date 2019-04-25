@@ -21,12 +21,20 @@ server_id=${BASH_REMATCH[1]}
 if [[ ! "$RESTORE_FROM_FOLDER" == "" ]]; then
     mkdir /backup_local
     cp -a /backup-storage/$RESTORE_FROM_FOLDER/* /backup_local
-    chown -R mysql:mysql /backup_local
+    # chown -R mysql:mysql /backup_local
 fi
+
+if [ -f /usr/local/bin/entrypoint.sh ]; then
+   ENTRYPOINT=/usr/local/bin/entrypoint.sh
+else
+   ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
+fi
+
+export USER=mysql
 
 if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]] || [[ "$CLUSTER_TOPOLOGY" == "masterslave" ]]; then
     # fire up the instance
-    /usr/local/bin/docker-entrypoint.sh mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
+    $ENTRYPOINT --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
 elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     MASTER_HOST=$(cat /mnt/config-map/master)
 
@@ -34,8 +42,19 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
 
     # fire up the instance
     if [[ "$MASTER_HOST" == "localhost" ]]; then
-        /usr/local/bin/docker-entrypoint.sh mysqld  --wsrep-new-cluster --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1 --wsrep-node-address=${DWAPI_PODIP}
+        # clean old galera state
+        if [[ -f /var/lib/mysql/grastate.dat ]]; then
+            rm -rf /var/lib/mysql/grastate.dat
+        fi
+
+        $ENTRYPOINT --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     else
-        /usr/local/bin/docker-entrypoint.sh mysqld --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1 --wsrep-node-address=${DWAPI_PODIP}
+        # prevent initialization, it is going to sync anyway
+        export SKIP_INITIALIZATION=1
+        if [ ! -d /var/lib/mysql/mysql ]; then
+            mkdir -p /var/lib/mysql/mysql
+        fi
+
+        $ENTRYPOINT --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     fi
 fi
