@@ -98,6 +98,10 @@ spec:
           value: {{ .Values.mariadb.server.backup.restoreFrom }}
         - name: CLUSTER_TOPOLOGY
           value: {{ .Values.mariadb.cluster.topology }}
+        {{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+        - name: ENABLE_LOGS
+          value: "1"
+        {{- end }}
         volumeMounts:
           - name: mariadb-secrets-vol
             mountPath: /mnt/secrets
@@ -123,6 +127,10 @@ spec:
           value: {{ .Values.mariadb.server.backup.restoreFrom }}
         - name: CLUSTER_TOPOLOGY
           value: {{ .Values.mariadb.cluster.topology }}
+        {{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+        - name: ENABLE_LOGS
+          value: "1"
+        {{- end }}
         ports:
         - containerPort: 3306
         {{- if or (.Values.mariadb.server.resources.limits.cpu) (.Values.mariadb.server.resources.limits.memory) (.Values.mariadb.server.resources.requests.cpu) (.Values.mariadb.server.resources.requests.memory) }}
@@ -159,8 +167,10 @@ spec:
         - name: data
           mountPath: /var/lib/mysql
           subPath: mysql
+{{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
         - name: logs
           mountPath: /var/log/mysql
+{{- end }}
         livenessProbe:
           exec:
             command: ["mysqladmin", "ping", "--host=127.0.0.1", "--port=3307"]
@@ -228,6 +238,7 @@ spec:
       {{- if .Values.mariadb.server.storage.class }}
       storageClassName: {{ .Values.mariadb.server.storage.class }}
       {{- end }}
+{{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
   - metadata:
       name: logs
       labels:
@@ -244,3 +255,4 @@ spec:
       {{- if .Values.mariadb.server.storage.class }}
       storageClassName: {{ .Values.mariadb.server.storage.class }}
       {{- end }}
+{{- end }}

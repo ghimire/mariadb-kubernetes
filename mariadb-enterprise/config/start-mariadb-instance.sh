@@ -16,7 +16,10 @@ set -ex
 # get server id from hostname, it will have the format <something>-<id>
 [[ $(hostname) =~ -([0-9]+)$ ]] || exit 1
 server_id=${BASH_REMATCH[1]}
-
+if [[ "$ENABLE_LOGS" == "1" ]]; then
+    chown -R mysql:mysql /var/log/mysql/
+    cp /mnt/config-map/mariadb-log.cnf /etc/mysql/conf.d/server-log.cnf
+fi
 # load backup
 if [[ ! "$RESTORE_FROM_FOLDER" == "" ]]; then
     mkdir /backup_local

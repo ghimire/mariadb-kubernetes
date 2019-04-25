@@ -66,6 +66,10 @@ data:
 {{- else }}
 {{ tpl (.Files.Get "config/start-mariadb-instance.sh") . | indent 4 }}
 {{- end }}
+  mariadb-log.cnf: |
+{{- if eq .Values.mariadb.cluster.monitoring.mode "global" }}
+{{ tpl (.Files.Get "config/monitoring/mariadb-log.cnf") . | indent 4 }}
+{{- end }}
   users.sql: |
 {{ tpl (.Files.Get "config/users.sql") . | indent 4 }}
 

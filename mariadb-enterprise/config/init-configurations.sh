@@ -34,7 +34,9 @@ ADMIN_PWD=$(cat /mnt/secrets/admin-password)
 REPL_USER=$(cat /mnt/secrets/repl-username)
 REPL_PWD=$(cat /mnt/secrets/repl-password)
 DB_HOST="$(hostname -f | cut -d '.' -f 1).$(hostname -f | cut -d '.' -f 2)"
-
+if [[ "$ENABLE_LOGS" == "1" ]]; then
+    cp /mnt/config-template/mariadb-log.cnf /mnt/config-map
+fi
 if [ "$1" == "maxscale" ]; then
     # ensure we replace with a configurations that will fail
     MASTER_HOST="should-not-be-used-here"
