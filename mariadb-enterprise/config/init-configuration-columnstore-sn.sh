@@ -50,7 +50,7 @@ MY_HOSTNAME=$(hostname)
 SPLIT_HOST=(${MY_HOSTNAME//-/ }); 
 CONT_INDEX=${SPLIT_HOST[(${#SPLIT_HOST[@]}-1)]}
 
-MY_IP=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
+MY_IP=$(hostname -i)
 
 function expand_templates() {
     sed -e "s/<<MASTER_HOST>>/${MASTER_HOST}/g" \
