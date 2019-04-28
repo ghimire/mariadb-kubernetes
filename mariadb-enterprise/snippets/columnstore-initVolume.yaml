@@ -10,7 +10,7 @@
 # Public License.
 
 - name: init-volume
-  image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
+  image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.columnstore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
   command:
     - bash
     - "-c"

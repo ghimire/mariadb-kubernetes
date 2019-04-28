@@ -84,7 +84,7 @@ spec:
       initContainers:
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.columnstore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -108,7 +108,7 @@ spec:
       containers:
 #Columnstore Module
       - name: columnstore-module-pm
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.columnstore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         # start a mariadb instance
         command:
         - bash
