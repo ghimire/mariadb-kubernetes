@@ -112,7 +112,7 @@ spec:
       initContainers:
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore-pm
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.columnstore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -138,7 +138,7 @@ spec:
       containers:
 #Columnstore Module
       - name: columnstore-module-pm
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.columnstore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         # start a mariadb instance
         command:
         - bash
@@ -292,7 +292,7 @@ spec:
       initContainers:
       ## runs a state store client to determine the IP of the active master
       - name: init-get-um-master
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.statestore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
         args: ["-c", "node ./client.js mariadb-init {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent
@@ -303,7 +303,7 @@ spec:
             name: mariadb-configtemplate-vol
       ## runs an initialization script to prepare the correct startup configuration
       - name: init-columnstore-um
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.columnstore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -329,7 +329,7 @@ spec:
       containers:
 #Columnstore Module
       - name: columnstore-module-um
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.columnstore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.columnstore.image }}
         # start a mariadb instance
         command:
         - bash
@@ -395,7 +395,7 @@ spec:
 
       # runs a state store client to ensure the state is being maitained
       - name: state-client
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.statestore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
         args: ["-c", "node ./client.js mariadb {{ .Release.Name }}-mdb-state /mnt/config-map"]
         imagePullPolicy: IfNotPresent
