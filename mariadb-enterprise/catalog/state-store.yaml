@@ -64,7 +64,7 @@ spec:
       {{- end }}
       containers:
       - name: state-store
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{- .Values.mariadb.statestore.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.statestore.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{- .Values.mariadb.statestore.image }}
         command: ["/bin/sh"]
         args: ["-c", "node ./server.js"]
         imagePullPolicy: IfNotPresent
