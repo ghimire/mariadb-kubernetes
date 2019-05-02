@@ -81,7 +81,7 @@ spec:
       initContainers:
       # simulate a state store client to bootstrap self as active master
       - name: init-get-master
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.server.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
         command: ["/bin/sh"]
         args: ["-c", "echo 'localhost' > /mnt/config-map/master"]
         imagePullPolicy: IfNotPresent
@@ -93,7 +93,7 @@ spec:
 
       # runs an initialization script to prepare the correct startup configuration
       - name: init-masterslave
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.server.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
         command:
           - bash
           - /mnt/config-template/init-configurations.sh
@@ -119,7 +119,7 @@ spec:
 
       containers:
       - name: mariadb-server
-        image: {{ if .Values.mariadb.cluster.imageRepo }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
+        image: {{ if and .Values.mariadb.cluster.imageRepo (not (regexMatch "^([-a-zA-Z0-9@:%._\\+~#=]{2,256}[.])+[-a-zA-Z0-9@:%._\\+~#=]{2,5}\\/" .Values.mariadb.server.image)) }}{{ .Values.mariadb.cluster.imageRepo}}/{{ end }}{{ .Values.mariadb.server.image }}
         command:
         # start a mariadb instance
         - bash
