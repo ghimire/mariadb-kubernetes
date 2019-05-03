@@ -26,15 +26,19 @@ fi
 
 if [ -f /usr/local/bin/entrypoint.sh ]; then
    ENTRYPOINT=/usr/local/bin/entrypoint.sh
+   
+   # TODO: this handles an interface incompatibility between RHEL and Debian images the interface must get aligned
+   USER_PARAM="--user=mysql"
 else
    ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
+   USER_PARAM=""
 fi
 
 export USER=mysql
 
 if [[ "$CLUSTER_TOPOLOGY" == "standalone" ]] || [[ "$CLUSTER_TOPOLOGY" == "masterslave" ]]; then
     # fire up the instance
-    $ENTRYPOINT --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
+    $ENTRYPOINT $USER_PARAM --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
 elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     MASTER_HOST=$(cat /mnt/config-map/master)
 
@@ -47,7 +51,7 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
             rm -rf /var/lib/mysql/grastate.dat
         fi
 
-        $ENTRYPOINT --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
+        $ENTRYPOINT $USER_PARAM --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     else
         # prevent initialization, it is going to sync anyway
         export SKIP_INITIALIZATION=1
@@ -55,6 +59,6 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
             mkdir -p /var/lib/mysql/mysql
         fi
 
-        $ENTRYPOINT --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
+        $ENTRYPOINT $USER_PARAM --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     fi
 fi
