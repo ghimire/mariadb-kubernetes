@@ -29,9 +29,11 @@ if [ -f /usr/local/bin/entrypoint.sh ]; then
    
    # TODO: this handles an interface incompatibility between RHEL and Debian images the interface must get aligned
    USER_PARAM="--user=mysql"
+   DATADIR="/var/lib/mysql/data"
 else
    ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
    USER_PARAM=""
+   DATADIR="/var/lib/mysql"
 fi
 
 export USER=mysql
@@ -47,7 +49,7 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     # fire up the instance
     if [[ "$MASTER_HOST" == "localhost" ]]; then
         # clean old galera state
-        if [[ -f /var/lib/mysql/grastate.dat ]]; then
+        if [[ -f $DATADIR/grastate.dat ]]; then
             rm -rf /var/lib/mysql/grastate.dat
         fi
 
@@ -55,8 +57,8 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     else
         # prevent initialization, it is going to sync anyway
         export SKIP_INITIALIZATION=1
-        if [ ! -d /var/lib/mysql/mysql ]; then
-            mkdir -p /var/lib/mysql/mysql
+        if [ ! -d $DATADIR/mysql ]; then
+            mkdir -p $DATADIR/mysql
         fi
 
         $ENTRYPOINT $USER_PARAM --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
