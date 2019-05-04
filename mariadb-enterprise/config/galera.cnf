@@ -12,5 +12,5 @@ wsrep_provider=<<LIBGALERA>>
 wsrep_provider_options="gcache.size=300M; gcache.page_size=300M"
 wsrep_cluster_name="<<RELEASE_NAME>>-<<CLUSTER_ID>>-cluster"
 wsrep_cluster_address="gcomm://<<CLUSTER_ADDRESS>>"
-wsrep_sst_method=mariabackup
-wsrep_sst_auth = <<ADMIN_USERNAME>>:<<ADMIN_PASSWORD>>
+wsrep_sst_method=rsync # mariabackup
+# wsrep_sst_auth=<<REPL_USERNAME>>:<<REPL_PASSWORD>>

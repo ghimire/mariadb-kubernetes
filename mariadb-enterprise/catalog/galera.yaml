@@ -80,6 +80,9 @@ spec:
         id.mariadb: "{{ .Values.mariadb.cluster.id }}"
         {{- end }}
     spec:
+      securityContext:
+        supplementalGroups: [998]
+
       {{ if .Values.mariadb.cluster.imagePullSecret -}}
       imagePullSecrets:
       - name: {{ .Values.mariadb.cluster.imagePullSecret }} 
