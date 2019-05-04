@@ -50,7 +50,7 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
     if [[ "$MASTER_HOST" == "localhost" ]]; then
         # clean old galera state
         if [[ -f $DATADIR/grastate.dat ]]; then
-            rm -rf /var/lib/mysql/grastate.dat
+            rm -rf $DATADIR/grastate.dat
         fi
 
         $ENTRYPOINT $USER_PARAM --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
