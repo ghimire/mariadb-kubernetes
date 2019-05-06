@@ -14,7 +14,30 @@
   command:
     - bash
     - "-c"
-    - "set -e; if [ ! -d \"/mnt/columnstore/etc\" ]; then rm -rf /mnt/columnstore/data && cp -rp /usr/local/mariadb/columnstore/data /mnt/columnstore/ && rm -rf /mnt/columnstore/local && cp -rp /usr/local/mariadb/columnstore/local /mnt/columnstore/ && rm -rf /mnt/columnstore/mysql && mkdir -p /mnt/columnstore/mysql && chown mysql:mysql /mnt/columnstore/mysql && cp -rp /usr/local/mariadb/columnstore/mysql/db /mnt/columnstore/mysql/ &&cp -rp /usr/local/mariadb/columnstore/etc /mnt/columnstore/; fi"
+    - whoami;
+          if [ $? -ne 0 ] && [ $(id -u) -ge 10000 ]; then
+          RANDOM_USER=1;
+          fi;
+          set -e;
+          if [ -n "$RANDOM_USER" ]; then
+          cat /etc/passwd | sed -e "s/mysql:/builder:/" > /tmp/passwd;
+          echo "mysql:x:$(id -u):$(id -g):,,,:/var/lib/mysql:/bin/bash" >> /tmp/passwd;
+          cat /tmp/passwd > /etc/passwd;
+          rm /tmp/passwd;
+          fi; 
+          if [ ! -d "/mnt/columnstore/etc" ]; then 
+          rm -rf /mnt/columnstore/data;
+          cp -rp /usr/local/mariadb/columnstore/data /mnt/columnstore/;
+          rm -rf /mnt/columnstore/local;
+          cp -rp /usr/local/mariadb/columnstore/local /mnt/columnstore/;
+          rm -rf /mnt/columnstore/mysql;
+          mkdir -p /mnt/columnstore/mysql;
+          if [[ "$(whoami)" == "root" ]]; then
+          chown mysql:mysql /mnt/columnstore/mysql;
+          fi; 
+          cp -rp /usr/local/mariadb/columnstore/mysql/db /mnt/columnstore/mysql/;
+          cp -rp /usr/local/mariadb/columnstore/etc /mnt/columnstore/;
+          fi
   volumeMounts:
     - name: data
       mountPath: /mnt/columnstore
