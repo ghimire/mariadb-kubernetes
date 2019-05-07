@@ -12,6 +12,24 @@
 #
 # Starts and initializes a MariaDB columnstore instance
 
+# detect randomly generated users on OpenShift environment
+
+# detect randomly generated users on OpenShift environment
+whoami 2> /dev/null
+if [ $? -ne 0 ] && [ $(id -u) -ge 10000 ]; then
+    RANDOM_USER=1
+fi
+
+set -e
+
+if [ -n "$RANDOM_USER" ]; then
+    # add the user to /etc/passwd
+    cat /etc/passwd | sed -e "s/mysql:/builder1:/" -e "s/root:/builder2:/" > /tmp/passwd
+    echo "root:x:$(id -u):$(id -g):,,,:/usr/local/mariadb/columnstore:/bin/bash" >> /tmp/passwd
+    cat /tmp/passwd > /etc/passwd
+    rm /tmp/passwd
+fi
+
 MASTER_HOST="<<MASTER_HOST>>"
 ADMIN_USERNAME="<<ADMIN_USERNAME>>"
 ADMIN_PASSWORD="<<ADMIN_PASSWORD>>"
@@ -36,7 +54,9 @@ if [ ! -z $MARIADB_CS_DEBUG ]; then
     #set -x
 fi
 
-cp /mnt/config-map/02_load_bookstore_data.sh /docker-entrypoint-initdb.d/01_load_bookstore_data.sh
+if [[ -f /mnt/config-map/02_load_bookstore_data.sh ]]; then
+    cp /mnt/config-map/02_load_bookstore_data.sh /docker-entrypoint-initdb.d/01_load_bookstore_data.sh
+fi
 
 bash /mnt/config-map/cs_init.sh &
 exec /usr/sbin/runsvdir-start
