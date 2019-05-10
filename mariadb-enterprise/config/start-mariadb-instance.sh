@@ -24,16 +24,15 @@ if [[ ! "$RESTORE_FROM_FOLDER" == "" ]]; then
     # chown -R mysql:mysql /backup_local
 fi
 
+# TODO: this handles an interface incompatibility between RHEL and Debian images the interface must get aligned
 if [ -f /usr/local/bin/entrypoint.sh ]; then
-   ENTRYPOINT=/usr/local/bin/entrypoint.sh
-   
-   # TODO: this handles an interface incompatibility between RHEL and Debian images the interface must get aligned
-   USER_PARAM="--user=mysql"
-   DATADIR="/var/lib/mysql/data"
+    ENTRYPOINT=/usr/local/bin/entrypoint.sh
+    USER_PARAM="--user=mysql"
+    DATADIR="/var/lib/mysql/data"
 else
-   ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
-   USER_PARAM=""
-   DATADIR="/var/lib/mysql"
+    ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
+    USER_PARAM=""
+    DATADIR="/var/lib/mysql"
 fi
 
 export USER=mysql
