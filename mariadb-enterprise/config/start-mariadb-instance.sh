@@ -24,16 +24,19 @@ if [[ ! "$RESTORE_FROM_FOLDER" == "" ]]; then
     # chown -R mysql:mysql /backup_local
 fi
 
+# TODO: this handles an interface incompatibility between RHEL and Debian images the interface must get aligned
 if [ -f /usr/local/bin/entrypoint.sh ]; then
-   ENTRYPOINT=/usr/local/bin/entrypoint.sh
-   
-   # TODO: this handles an interface incompatibility between RHEL and Debian images the interface must get aligned
-   USER_PARAM="--user=mysql"
-   DATADIR="/var/lib/mysql/data"
+    IS_RHEL_ENVIRONMENT=1
+fi
+
+if [ -n $IS_RHEL_ENVIRONMENT ]; then
+    ENTRYPOINT=/usr/local/bin/entrypoint.sh
+    USER_PARAM="--user=mysql"
+    DATADIR="/var/lib/mysql/data"
 else
-   ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
-   USER_PARAM=""
-   DATADIR="/var/lib/mysql"
+    ENTRYPOINT=/usr/local/bin/docker-entrypoint.sh
+    USER_PARAM=""
+    DATADIR="/var/lib/mysql"
 fi
 
 export USER=mysql
@@ -56,7 +59,12 @@ elif [[ "$CLUSTER_TOPOLOGY" == "galera" ]]; then
         $ENTRYPOINT $USER_PARAM --wsrep-new-cluster --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     else
         # prevent initialization, it is going to sync anyway
-        export SKIP_INITIALIZATION=1
+        if [ -n $IS_RHEL_ENVIRONMENT ]; then
+            export SKIP_INITIALIZATION=1
+        else
+            mkdir -p $DATADIR/mysql
+        fi
+
         $ENTRYPOINT $USER_PARAM --wsrep-node-address=${DWAPI_PODIP} --log-bin=mariadb-bin --binlog-format=ROW --server-id=$((3000 + $server_id)) --log-slave-updates=1 --gtid-strict-mode=1 --innodb-flush-method=fsync --extra-port=3307 --extra_max_connections=1
     fi
 fi
