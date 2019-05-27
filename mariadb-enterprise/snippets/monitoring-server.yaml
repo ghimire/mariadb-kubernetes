@@ -14,6 +14,8 @@
   image: {{ .Values.mariadb.server.monitoring.logsMonitoring.image }}
   imagePullPolicy: "Always"
   env:
+  - name: MARIADB_CLUSTER_NAME
+    value: {{ .Release.Namespace }}
   - name: MARIADB_INFLUXDB_HOST
     value: "influxdb-stardust"
   - name: MARIADB_INFLUXDB_PORT
