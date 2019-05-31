@@ -56,7 +56,7 @@ mariadb:
       metricsMonitoring: 
         image: prom/mysqld-exporter:v0.11.0
       logsMonitoring:
-        image: gcr.io/dbaas-development/mariadb/fluentd:0.0.1
+        image: gcr.io/dbaas-development/mariadb/fluentd:0.0.2
 # maxscale parameters
   maxscale:
     image: mariadb/maxscale:2.2

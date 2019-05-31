@@ -18,24 +18,6 @@
     value: {{ .Release.Namespace }}
   - name: MARIADB_INFLUXDB_HOST
     value: "influxdb-stardust"
-  - name: MARIADB_INFLUXDB_PORT
-    value: "8086"
-  - name: MARIADB_INFLUXDB_DB_NAME
-    value: "mariadb"
-  - name: MARIADB_INFLUXDB_USER
-    value: "fluents"
-  - name: MARIADB_INFLUXDB_PASSWORD
-    value: "fluentd"
-  - name: MARIADB_INFLUXDB_PASSWORD
-    value: "fluentd"
-  - name: MARIADB_GENERAL_QUERY_LOG_PATH
-    value: "/fluentd/log/mariadb.log"
-  - name: MARIADB_GENERAL_QUERY_LOG_POS_PATH
-    value: "/fluentd/pos/mariadb.log.pos"
-  - name: MARIADB_SLOW_QUERY_LOG_PATH
-    value: "/fluentd/log/mariadb-slow.log"
-  - name: MARIADB_SLOW_QUERY_LOG_POS_PATH
-    value: "/fluentd/pos/mariadb-slow.log.pos"
   ports:
   - name: logs
     containerPort: 9104
