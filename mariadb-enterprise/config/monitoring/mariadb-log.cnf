@@ -2,13 +2,15 @@
 pid-file                      = /var/run/mysqld/mysqld.pid
 
 [mariadb]
-log_output                    =FILE
+log_output                    = FILE
+log_error                     = /var/log/mysql/mariadb.err
+
 general_log
-general_log_file              =/var/log/mysql/mariadb.log
+general_log_file              = /var/log/mysql/mariadb.log
 slow_query_log
-slow_query_log_file           =/var/log/mysql/mariadb-slow.log
-long_query_time               =1
-log_slow_admin_statements     =ON
+slow_query_log_file           = /var/log/mysql/mariadb-slow.log
+long_query_time               = 1
+log_slow_admin_statements     = ON
 plugin-load                   = server_audit=server_audit.so
 server_audit_logging          = ON
 server_audit_events           = connect,query,table
