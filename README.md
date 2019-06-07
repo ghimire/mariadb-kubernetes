@@ -11,7 +11,7 @@ In order to use MariaDB Kubernetes, clone the repository onto your system using 
 
 
 ```
-$ git clone https://github.com/mariadb-coproration/mariadb-kubernetes
+$ git clone https://github.com/mariadb-corporation/mariadb-kubernetes
 ```
 
 Then use Helm to install MariaDB Kubernetes in your cluster:
